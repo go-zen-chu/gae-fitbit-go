@@ -1,5 +1,5 @@
 runtime: go
-api_version: go11
+api_version: go10
 
 handlers:
 

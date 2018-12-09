@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-zen-chu/gae-fitbit-go/pkg/application/command"
 )

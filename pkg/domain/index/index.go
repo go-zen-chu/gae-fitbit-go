@@ -21,5 +21,5 @@ func NewIndexHandler() IndexHandler {
 
 func (ih *indexHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
-	log.Infof("Request to index from : %s", r.RemoteAddr)
+	log.Infof("Request to index from : %s, %v", r.RemoteAddr, r)
 }

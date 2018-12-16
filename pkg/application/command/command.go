@@ -48,7 +48,7 @@ func (c *command) Run() error {
 		port: *port,
 	}
 
-	fac := &fitbitauth.FitbitAuthConfig{
+	fac := &fitbitauth.FitbitAuthParams{
 		ClientID:     *fbClientID,
 		Scope:        "sleep activity",
 		RedirectURI:  *fbAuthRedirectURI,

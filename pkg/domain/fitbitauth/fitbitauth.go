@@ -13,25 +13,25 @@ type FitbitAuthHandler interface {
 }
 
 type fitbitAuthHandler struct {
-	fitbitAuthConfig *FitbitAuthConfig
+	FitbitAuthParams *FitbitAuthParams
 	factory          Factory
 }
 
-func NewFitbitAuthHandler(fac *FitbitAuthConfig, fbaf Factory) FitbitAuthHandler {
+func NewFitbitAuthHandler(fac *FitbitAuthParams, fbaf Factory) FitbitAuthHandler {
 	return &fitbitAuthHandler{
-		fitbitAuthConfig: fac,
+		FitbitAuthParams: fac,
 		factory:          fbaf,
 	}
 }
 
 // Redirect to Fitbit's oauth url
 func (fah *fitbitAuthHandler) Redirect2Fitbit(w http.ResponseWriter, r *http.Request) {
-	redirectURL := CreateFitbitAuthURL(fah.fitbitAuthConfig)
+	redirectURL := CreateFitbitAuthURL(fah.FitbitAuthParams)
 	http.Redirect(w, r, redirectURL.String(), http.StatusSeeOther)
 }
 
 // CreateFitbitAuthURL : Generate Fitbit's oauth authorization flow url
-func CreateFitbitAuthURL(fac *FitbitAuthConfig) *url.URL {
+func CreateFitbitAuthURL(fac *FitbitAuthParams) *url.URL {
 	url := &url.URL{}
 	url.Scheme = "https"
 	url.Host = "www.fitbit.com"

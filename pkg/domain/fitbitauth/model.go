@@ -12,7 +12,6 @@ type FitbitAuthParams struct {
 // FitbitTokenParams : [Using OAuth 2.0](https://dev.fitbit.com/build/reference/web-api/oauth2/#authorization-page)
 type FitbitTokenParams struct {
 	ClientID    string
-	Code        string
 	GrantType   string
 	RedirectURI string
 }

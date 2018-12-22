@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,31 +16,30 @@ import (
 type FitbitAuthHandler interface {
 	Redirect2Fitbit(w http.ResponseWriter, r *http.Request)
 	HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request)
-	GetFitbitTokens(authCode string, fbClientSecret string) (*FitbitTokens, error)
 }
 
 type fitbitAuthHandler struct {
+	factory           Factory
 	fitbitAuthParams  *FitbitAuthParams
 	fitbitTokenParams *FitbitTokenParams
-	factory           Factory
 }
 
-func NewFitbitAuthHandler(fac *FitbitAuthParams, ftp *FitbitTokenParams, fbaf Factory) FitbitAuthHandler {
+func NewFitbitAuthHandler(fbaf Factory, fac *FitbitAuthParams, ftp *FitbitTokenParams) FitbitAuthHandler {
 	return &fitbitAuthHandler{
+		factory:           fbaf,
 		fitbitAuthParams:  fac,
 		fitbitTokenParams: ftp,
-		factory:           fbaf,
 	}
 }
 
 // Redirect to Fitbit's oauth url
 func (fah *fitbitAuthHandler) Redirect2Fitbit(w http.ResponseWriter, r *http.Request) {
-	redirectURL := CreateFitbitAuthURL(fah.fitbitAuthParams)
+	redirectURL := createFitbitAuthURL(fah.fitbitAuthParams)
 	http.Redirect(w, r, redirectURL.String(), http.StatusSeeOther)
 }
 
-// CreateFitbitAuthURL : Generate Fitbit's oauth authorization flow url
-func CreateFitbitAuthURL(fac *FitbitAuthParams) *url.URL {
+// createFitbitAuthURL : Generate Fitbit's oauth authorization flow url
+func createFitbitAuthURL(fac *FitbitAuthParams) *url.URL {
 	u := &url.URL{}
 	u.Scheme = "https"
 	u.Host = "www.fitbit.com"
@@ -55,7 +55,7 @@ func CreateFitbitAuthURL(fac *FitbitAuthParams) *url.URL {
 	return u
 }
 
-// HandleFitbitAuthCode : Will recieve auth code from Fitbit, store it to Store
+// HandleFitbitAuthCode : Will recieve auth code from Fitbit, store it
 func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request) {
 	keys, ok := r.URL.Query()["code"]
 
@@ -63,40 +63,55 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 		log.Errorf("Could not get auth code from request")
 		return
 	}
-
-	st, err := fah.factory.FileStore()
+	// auth code is one time, no need to save it
+	code := keys[0]
+	log.Debugf("auth code :%s", code)
+	fst, err := fah.factory.FileStore()
 	if err != nil {
 		log.Errorf("Error while getting store : %v", err)
 		return
 	}
 
-	err = st.WriteAuthCode(keys[0])
+	ft, err := requestFitbitTokens(fah.fitbitTokenParams, code)
 	if err != nil {
-		log.Errorf("Error while writing auth code : %v", err)
+		log.Errorf("Error while getting token : %v", err)
 		return
 	}
+
+	err = fst.WriteFitbitTokens(ft)
+	if err != nil {
+		log.Errorf("Error while storing token : %v", err)
+		return
+	}
+	log.Info("Success storing fitbit tokens")
+	fmt.Fprintf(w, "OK")
 }
 
-func (fah *fitbitAuthHandler) GetFitbitTokens(authCode string, fbClientSecret string) (*FitbitTokens, error) {
-	base64secret := base64.StdEncoding.EncodeToString([]byte(fbClientSecret))
+func requestFitbitTokens(fbtp *FitbitTokenParams, authCode string) (*FitbitTokens, error) {
 	u := &url.URL{}
 	u.Scheme = "https"
-	u.Host = "www.fitbit.com"
+	u.Host = "api.fitbit.com"
 	u.Path = "/oauth2/token"
 
 	v := url.Values{}
 	v.Set("code", authCode)
-	v.Add("grant_type", fah.fitbitTokenParams.GrantType)
-	v.Add("client_id", fah.fitbitTokenParams.ClientID)
-	v.Add("redirect_uri", fah.fitbitTokenParams.RedirectURI)
+	v.Add("grant_type", fbtp.GrantType)
+	v.Add("client_id", fbtp.ClientID)
+	v.Add("redirect_uri", fbtp.RedirectURI)
 
 	rd := strings.NewReader(v.Encode())
 	req, err := http.NewRequest("POST", u.String(), rd)
 	if err != nil {
 		return nil, err
 	}
+	// [Auth header](https://dev.fitbit.com/build/reference/web-api/oauth2/#authorization-header)
+	clientAndSecret := fmt.Sprintf("%s:%s", fbtp.ClientID, fbtp.ClientSecret)
+	base64secret := base64.StdEncoding.EncodeToString([]byte(clientAndSecret))
+
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", base64secret))
-	req.Header.Set("content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	log.Debugf("Sending request to Fitbit API: %v", req)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -105,9 +120,11 @@ func (fah *fitbitAuthHandler) GetFitbitTokens(authCode string, fbClientSecret st
 	}
 	defer res.Body.Close()
 
-	fj := &FitbitTokens{}
-	if err = json.NewDecoder(res.Body).Decode(fj); err != nil {
-		return nil, err
+	log.Infof("Status Code from Fitbit API: %d", res.StatusCode)
+
+	var ft FitbitTokens
+	if err := json.NewDecoder(res.Body).Decode(ft); err != nil {
+		return nil, errors.Wrap(err, "Error while decoding token: ")
 	}
-	return fj, nil
+	return &ft, nil
 }

@@ -48,6 +48,7 @@ func (c *command) Run() error {
 	cnf := &config{
 		port: *port,
 	}
+	log.Infof("%s", port)
 
 	fac := &dfba.FitbitAuthParams{
 		ClientID:     *fbClientID,
@@ -58,21 +59,20 @@ func (c *command) Run() error {
 	}
 
 	ftp := &dfba.FitbitTokenParams{
-		ClientID:    *fbClientID,
-		GrantType:   "authorization_code",
-		RedirectURI: *fbAuthRedirectURI,
+		ClientID:     *fbClientID,
+		ClientSecret: *fbClientSecret,
+		GrantType:    "authorization_code",
+		RedirectURI:  *fbAuthRedirectURI,
 	}
-
+	// create handlers
 	ih := index.NewIndexHandler()
 	fbaf := ifba.NewFactory()
-	fah := dfba.NewFitbitAuthHandler(fac, fbaf)
-
-	// TODO: cred を作成して、それを infra の service にわたす
+	fah := dfba.NewFitbitAuthHandler(fbaf, fac, ftp)
 
 	// Register http handler to routes
 	http.HandleFunc("/index.html", ih.HandleIndex)
 	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fah.Redirect2Fitbit)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbitcode", apiVersion), fah.HandleFitbitAuthCode)
+	http.HandleFunc(fmt.Sprintf("/%s/storetoken", apiVersion), fah.HandleFitbitAuthCode)
 
 	log.Infof("Running gae-fitbit-go on : %s", cnf.port)
 	return http.ListenAndServe(fmt.Sprintf(":%s", cnf.port), nil)

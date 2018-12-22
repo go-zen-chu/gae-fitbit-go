@@ -1,0 +1,14 @@
+@startuml
+
+actor User
+database Store
+
+User -> App : access /v1/fitbitauth
+App -> Fitbit : redirect
+User -> Fitbit : permit App
+App <- Fitbit : redirect to registered url (/v1/storetoken)
+App -> Fitbit : get token using auth code
+App <- Fitbit : return access, refresh token
+App -> Store : save tokens
+
+@enduml

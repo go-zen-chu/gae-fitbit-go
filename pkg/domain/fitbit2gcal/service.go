@@ -8,7 +8,7 @@ type Service interface {
 
 type service struct {
 	fitbitClient FitbitClient
-	gcalClient GCalClient
+	gcalClient   GCalClient
 }
 
 const (
@@ -17,12 +17,12 @@ const (
 
 func (s *service) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	fromDateStr := q.Get("fdate")
-	toDateStr := q.Get("tdate")
+	_ := q.Get("from_date")
+	_ := q.Get("to_date")
 }
 
-// GetFitbitData : Get sleep, activity duration data from fitbit
-func GetFitbitData(fromDateStr, toDateStr string) {
+// getFitbitData : Get sleep, activity duration data from fitbit
+func getFitbitData(fromDateStr, toDateStr string) {
 
 }
 

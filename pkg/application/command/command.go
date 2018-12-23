@@ -8,6 +8,7 @@ import (
 
 	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
 	"github.com/go-zen-chu/gae-fitbit-go/pkg/domain/index"
+	if2g "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/fitbit2gcal"
 	ifba "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/fitbitauth"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -48,9 +49,8 @@ func (c *command) Run() error {
 	cnf := &config{
 		port: *port,
 	}
-	log.Infof("%s", port)
 
-	fac := &dfba.FitbitAuthParams{
+	fitbitAuthParams := &dfba.FitbitAuthParams{
 		ClientID:     *fbClientID,
 		Scope:        "sleep activity",
 		RedirectURI:  *fbAuthRedirectURI,
@@ -58,21 +58,24 @@ func (c *command) Run() error {
 		Expires:      "2592000", // 1 week
 	}
 
-	ftp := &dfba.FitbitTokenParams{
+	fitbitTokenParams := &dfba.FitbitTokenParams{
 		ClientID:     *fbClientID,
 		ClientSecret: *fbClientSecret,
 		GrantType:    "authorization_code",
 		RedirectURI:  *fbAuthRedirectURI,
 	}
 	// create handlers
-	ih := index.NewIndexHandler()
-	fbaf := ifba.NewFactory()
-	fah := dfba.NewFitbitAuthHandler(fbaf, fac, ftp)
+	indexHandler := index.NewIndexHandler()
+	fitbitAuthFactory := ifba.NewFactory()
+	fitbitAuthHandler := dfba.NewFitbitAuthHandler(fitbitAuthFactory, fitbitAuthParams, fitbitTokenParams)
+	fitbit2gcalFactory := if2g.NewFactory()
+	fitbit2gcalService := fitbit2gcalFactory.Service()
 
 	// Register http handler to routes
-	http.HandleFunc("/index.html", ih.HandleIndex)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fah.Redirect2Fitbit)
-	http.HandleFunc(fmt.Sprintf("/%s/storetoken", apiVersion), fah.HandleFitbitAuthCode)
+	http.HandleFunc("/index.html", indexHandler.HandleIndex)
+	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fitbitAuthHandler.Redirect2Fitbit)
+	http.HandleFunc(fmt.Sprintf("/%s/storetoken", apiVersion), fitbitAuthHandler.HandleFitbitAuthCode)
+	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), fitbit2gcalService.HandleFitbit2GCal)
 
 	log.Infof("Running gae-fitbit-go on : %s", cnf.port)
 	return http.ListenAndServe(fmt.Sprintf(":%s", cnf.port), nil)

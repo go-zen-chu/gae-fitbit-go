@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -24,10 +25,10 @@ type fitbitAuthHandler struct {
 	fitbitTokenParams *FitbitTokenParams
 }
 
-func NewFitbitAuthHandler(fbaf Factory, fac *FitbitAuthParams, ftp *FitbitTokenParams) FitbitAuthHandler {
+func NewFitbitAuthHandler(fbaf Factory, fap *FitbitAuthParams, ftp *FitbitTokenParams) FitbitAuthHandler {
 	return &fitbitAuthHandler{
 		factory:           fbaf,
-		fitbitAuthParams:  fac,
+		fitbitAuthParams:  fap,
 		fitbitTokenParams: ftp,
 	}
 }
@@ -39,17 +40,17 @@ func (fah *fitbitAuthHandler) Redirect2Fitbit(w http.ResponseWriter, r *http.Req
 }
 
 // createFitbitAuthURL : Generate Fitbit's oauth authorization flow url
-func createFitbitAuthURL(fac *FitbitAuthParams) *url.URL {
+func createFitbitAuthURL(fap *FitbitAuthParams) *url.URL {
 	u := &url.URL{}
 	u.Scheme = "https"
 	u.Host = "www.fitbit.com"
 	u.Path = "/oauth2/authorize"
 	q := u.Query()
-	q.Set("client_id", fac.ClientID)
-	q.Set("redirect_uri", fac.RedirectURI)
-	q.Set("scope", fac.Scope)
-	q.Set("expires_in", fac.Expires)
-	q.Set("response_type", fac.ResponseType)
+	q.Set("client_id", fap.ClientID)
+	q.Set("redirect_uri", fap.RedirectURI)
+	q.Set("scope", fap.Scope)
+	q.Set("expires_in", fap.Expires)
+	q.Set("response_type", fap.ResponseType)
 	u.RawQuery = q.Encode()
 	log.Debugf("create fitbit auth url : %s", u.String())
 	return u
@@ -58,29 +59,38 @@ func createFitbitAuthURL(fac *FitbitAuthParams) *url.URL {
 // HandleFitbitAuthCode : Will recieve auth code from Fitbit, store it
 func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request) {
 	keys, ok := r.URL.Query()["code"]
-
+	var err error
 	if !ok || len(keys[0]) < 1 {
-		log.Errorf("Could not get auth code from request")
+		err = errors.New("Could not get auth code from request")
+		log.Errorln(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 	// auth code is one time, no need to save it
 	code := keys[0]
 	log.Debugf("auth code :%s", code)
+
 	fst, err := fah.factory.FileStore()
 	if err != nil {
-		log.Errorf("Error while getting store : %v", err)
+		err = errors.Wrap(err, "Error while getting store")
+		log.Errorln(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
 	ft, err := requestFitbitTokens(fah.fitbitTokenParams, code)
 	if err != nil {
-		log.Errorf("Error while getting token : %v", err)
+		err = errors.Wrap(err, "Error while getting token")
+		log.Errorln(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
 	err = fst.WriteFitbitTokens(ft)
 	if err != nil {
-		log.Errorf("Error while storing token : %v", err)
+		err = errors.Wrap(err, "Error while storing token")
+		log.Errorln(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 	log.Info("Success storing fitbit tokens")
@@ -122,9 +132,21 @@ func requestFitbitTokens(fbtp *FitbitTokenParams, authCode string) (*FitbitToken
 
 	log.Infof("Status Code from Fitbit API: %d", res.StatusCode)
 
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error while reading body")
+	}
+	// error response from Fitbit API
+	if res.StatusCode != http.StatusOK {
+		log.Debugf("%d %s", res.StatusCode, string(bodyBytes))
+		msg := fmt.Sprintf("Error response from Fitbit API: %d", res.StatusCode)
+		return nil, errors.New(msg)
+	}
+
 	var ft FitbitTokens
-	if err := json.NewDecoder(res.Body).Decode(ft); err != nil {
-		return nil, errors.Wrap(err, "Error while decoding token: ")
+	if err := json.Unmarshal(bodyBytes, &ft); err != nil {
+		log.Debugf("%d %s\n", res.StatusCode, string(bodyBytes))
+		return nil, errors.Wrap(err, "Error while decoding token")
 	}
 	return &ft, nil
 }

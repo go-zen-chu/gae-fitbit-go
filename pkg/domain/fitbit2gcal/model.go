@@ -58,47 +58,47 @@ type SleepLevelsDatapoint struct {
 }
 
 type Activity struct {
-	Activities []ActivityData `json:""`
+	Activities []ActivityData `json:"activities"`
 }
 
 type ActivityData struct {
-	ActivityID       int     `json:activityId`
-	ActivityParentID int     `json:activityParentId`
-	Calories         int     `json:calories`
-	Description      string  `json:description`
-	Distance         float32 `json:distance`
-	Duration         int     `json:duration`
-	HasStartTime     bool    `json:hasStartTime`
-	IsFavorite       bool    `json:isFavorite`
-	LogID            int     `json:logId`
-	Name             string  `json:name`
-	StartTime        string  `json:startTime`
-	Steps            int     `json:steps`
+	ActivityID       int     `json:"activityId"`
+	ActivityParentID int     `json:"activityParentId"`
+	Calories         int     `json:"calories"`
+	Description      string  `json:"description"`
+	Distance         float32 `json:"distance"`
+	Duration         int     `json:"duration"`
+	HasStartTime     bool    `json:"hasStartTime"`
+	IsFavorite       bool    `json:"isFavorite"`
+	LogID            int     `json:"logId"`
+	Name             string  `json:"name"`
+	StartTime        string  `json:"startTime"`
+	Steps            int     `json:"steps"`
 }
 
 type ActivityGoals struct {
-	caloriesOut int     `json:caloriesOut`
-	Distance    float32 `json:distance`
-	Floors      int     `json:floors`
-	Steps       int     `json:steps`
+	CaloriesOut int     `json:"caloriesOut"`
+	Distance    float32 `json:"distance"`
+	Floors      int     `json:"floors"`
+	Steps       int     `json:"steps"`
 }
 
 type ActivitySummary struct {
-	ActivityCalories     int                `json:activityCalories`
-	CaloriesBMR          int                `json:caloriesBMR`
-	CaloriesOut          int                `json:caloriesOut`
-	Distances            []ActivityDistance `json:distances`
-	Elevation            float32            `json:elevation`
-	FairlyActiveMinutes  int                `json:fairlyActiveMinutes`
-	Floors               int                `json:floors`
-	LightlyActiveMinutes int                `json:lightlyActiveMinutes`
-	MarginalCalories     int                `json:marginalCalories`
-	SedentaryMinutes     int                `json:sedentaryMinutes`
-	Steps                int                `json:steps`
-	VeryActiveMinutes    int                `json:veryActiveMinutes`
+	ActivityCalories     int                `json:"activityCalories"`
+	CaloriesBMR          int                `json:"caloriesBMR"`
+	CaloriesOut          int                `json:"caloriesOut"`
+	Distances            []ActivityDistance `json:"distances"`
+	Elevation            float32            `json:"elevation"`
+	FairlyActiveMinutes  int                `json:"fairlyActiveMinutes"`
+	Floors               int                `json:"floors"`
+	LightlyActiveMinutes int                `json:"lightlyActiveMinutes"`
+	MarginalCalories     int                `json:"marginalCalories"`
+	SedentaryMinutes     int                `json:"sedentaryMinutes"`
+	Steps                int                `json:"steps"`
+	VeryActiveMinutes    int                `json:"veryActiveMinutes"`
 }
 
 type ActivityDistance struct {
-	Activity string  `json:activity`
-	Distance float32 `json:distance`
+	Activity string  `json:"activity"`
+	Distance float32 `json:"distance"`
 }

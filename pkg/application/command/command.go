@@ -66,16 +66,16 @@ func (c *command) Run() error {
 	}
 	// create handlers
 	indexHandler := index.NewIndexHandler()
-	fitbitAuthFactory := ifba.NewFactory()
-	fitbitAuthHandler := dfba.NewFitbitAuthHandler(fitbitAuthFactory, fitbitAuthParams, fitbitTokenParams)
-	fitbit2gcalFactory := if2g.NewFactory()
-	fitbit2gcalService := fitbit2gcalFactory.Service()
+	fbaFactory := ifba.NewFactory()
+	fbaHandler := fbaFactory.FitbitAuthHandler(fitbitAuthParams, fitbitTokenParams)
+	f2gFactory := if2g.NewFactory()
+	f2gService := f2gFactory.Service()
 
 	// Register http handler to routes
 	http.HandleFunc("/index.html", indexHandler.HandleIndex)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fitbitAuthHandler.Redirect2Fitbit)
-	http.HandleFunc(fmt.Sprintf("/%s/storetoken", apiVersion), fitbitAuthHandler.HandleFitbitAuthCode)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), fitbit2gcalService.HandleFitbit2GCal)
+	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fbaHandler.Redirect2Fitbit)
+	http.HandleFunc(fmt.Sprintf("/%s/storetoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
+	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
 
 	log.Infof("Running gae-fitbit-go on : %s", cnf.port)
 	return http.ListenAndServe(fmt.Sprintf(":%s", cnf.port), nil)

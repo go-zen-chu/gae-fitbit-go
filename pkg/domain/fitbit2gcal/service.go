@@ -39,27 +39,27 @@ func (s *service) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
 	if fromDateStr == "" || toDateStr == "" {
 		err = errors.New("Insufficient params fromDate, toDate")
 		log.Errorln(err)
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	fromDate, err := time.Parse("20060102", fromDateStr)
 	if err != nil {
 		err = errors.Wrap(err, "Error parsing fromDateStr")
 		log.Errorln(err)
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	toDate, err := time.Parse("20060102", toDateStr)
 	if err != nil {
 		err = errors.Wrap(err, "Error parsing toDateStr")
 		log.Errorln(err)
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if fromDate.After(toDate) {
 		err = errors.New("Invalid parameter, fromDate > toDate")
 		log.Errorln(err)
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -67,10 +67,26 @@ func (s *service) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		err = errors.Wrap(err, "Error getting data from Fitbit")
 		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	log.Infof("%v %v", sleeps, activities)
+
+	for sleep := range sleeps {
+		events :=
+		err = s.gcalClient.InsertEvent(event, "sleep")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+	for sleep := range sleeps {
+		events :=
+		err = s.gcalClient.InsertEvent(event, "activity")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+	fmt.Fprint(w, "OK")
 }
 
 // getFitbitData : Get sleep, activity duration data from fitbit
@@ -95,11 +111,15 @@ func (s *service) getFitbitData(fromDate, toDate time.Time) ([]Sleep, []Activity
 	return sleeps, activities, nil
 }
 
-func convertSleep2Event() {
-
+func convertSleep2Events(sleep *Sleep) []calendar.Event {
+	var 
+	sleep.
+	return &calendar.Event {
+		Summary:
+	}
 }
 
-func convertActivity2Event() {
+func convertActivity2Events() {
 
 }
 

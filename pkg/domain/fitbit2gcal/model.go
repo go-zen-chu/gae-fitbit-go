@@ -1,5 +1,10 @@
 package fitbit2gcal
 
+type GCalConfig struct {
+	SleepCalendarID    string
+	ActivityCalendarID string
+}
+
 type Schedule struct {
 	Title    string
 	Location string

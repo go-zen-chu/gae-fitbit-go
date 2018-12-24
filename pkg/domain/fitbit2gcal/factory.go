@@ -5,5 +5,5 @@ type Factory interface {
 	Service() Service
 	FileStore() Store
 	FitbitClient(store Store) FitbitClient
-	GCalClient() GCalClient
+	// GCalClient() GCalClient
 }

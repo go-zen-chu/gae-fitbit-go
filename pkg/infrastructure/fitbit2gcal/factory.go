@@ -10,10 +10,10 @@ func NewFactory() df2g.Factory {
 	return &factory{}
 }
 
-func (f *factory) Service() df2g.Service {
+func (f *factory) Service(gcalConfig *df2g.GCalConfig) df2g.Service {
 	st := f.FileStore()
 	fbc := NewFitbitClient(st)
-	gc := NewGCalClient()
+	gc := NewGCalClient(st, gcalConfig)
 	return df2g.NewService(fbc, gc)
 }
 
@@ -26,7 +26,7 @@ func (f *factory) FitbitClient(store df2g.Store) df2g.FitbitClient {
 	return fc
 }
 
-func (f *factory) GCalClient() df2g.GCalClient {
-	gc := NewGCalClient()
+func (f *factory) GCalClient(store df2g.Store, gcalConfig *df2g.GCalConfig) df2g.GCalClient {
+	gc := NewGCalClient(store, gcalConfig)
 	return gc
 }

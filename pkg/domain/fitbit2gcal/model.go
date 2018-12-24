@@ -1,17 +1,16 @@
 package fitbit2gcal
 
-type Creds struct {
-	FitbitCred FitbitCred
-	GCalCred   GCalCred
+type Schedule struct {
+	Title    string
+	Location string
+	Year     string
+	Month    string
+	Day      string
+	Start    string
+	End      string
 }
 
-type FitbitCred struct {
-}
-
-type GCalCred struct {
-}
-
-//
+// Sleep : Sleep data
 type Sleep struct {
 	Sleep []SleepData `json:"sleep"`
 }

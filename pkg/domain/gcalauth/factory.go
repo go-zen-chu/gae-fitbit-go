@@ -1,4 +1,3 @@
-//go:generate mockgen -source factory.go -destination mock_factory.go
 package gcalauth
 
 // Factory : Creates objects in this package

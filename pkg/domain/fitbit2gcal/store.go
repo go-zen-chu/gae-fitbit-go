@@ -1,4 +1,3 @@
-//go:generate mockgen -source store.go -destination mock_store.go
 package fitbit2gcal
 
 import (

@@ -198,13 +198,9 @@ func convertActivity2Events(activity *Activity) ([]calendar.Event, error) {
 	}
 
 	for _, a := range activity.Activities {
-		if a.HasStartTime == false {
-			log.Infof("Activity %s has no start time", a.Name)
-			continue
-		}
 		duration :=  time.Duration(a.Duration) * time.Millisecond
 
-		startTime, err := time.ParseInLocation("2006-01-02T15:04:05.999", a.StartTime, lc)
+		startTime, err := time.ParseInLocation("2006-01-02T15:04:05.999-07:00", a.StartTime, lc)
 		if err != nil {
 			return nil, err
 		}

@@ -77,7 +77,6 @@ type ActivityData struct {
 	Description      string  `json:"description"`
 	Distance         float32 `json:"distance"`
 	Duration         int     `json:"duration"`
-	HasStartTime     bool    `json:"hasStartTime"`
 	IsFavorite       bool    `json:"isFavorite"`
 	LogID            int     `json:"logId"`
 	Name             string  `json:"name"`

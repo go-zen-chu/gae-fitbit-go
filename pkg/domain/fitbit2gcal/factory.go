@@ -1,4 +1,3 @@
-//go:generate mockgen -source factory.go -destination mock_factory.go
 package fitbit2gcal
 
 // Factory : Creates objects in this domain

@@ -1,3 +1,12 @@
+.idea/
+vendor/
+/gae-fitbit-go
+/fitbit*.txt
+/fitbit*.json
+/cred*.json
+/gcal*.json
+.envrc
+
 ### https://raw.github.com/github/gitignore/ab477818977684f0f6ff370da9508e08944bc8c8/Global/Windows.gitignore
 
 # Windows thumbnail cache files
@@ -58,5 +67,3 @@ tags
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
-
-

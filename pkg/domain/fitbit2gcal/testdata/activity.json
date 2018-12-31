@@ -1,0 +1,169 @@
+{
+  "activities": [{
+    "activeDuration": 615000,
+    "activityLevel": [{
+      "minutes": 0,
+      "name": "sedentary"
+    }, {
+      "minutes": 0,
+      "name": "lightly"
+    }, {
+      "minutes": 3,
+      "name": "fairly"
+    }, {
+      "minutes": 7,
+      "name": "very"
+    }],
+    "activityName": "Walk",
+    "activityTypeId": 90013,
+    "calories": 64,
+    "duration": 615000,
+    "elevationGain": 0,
+    "hasGps": false,
+    "lastModified": "2017-02-27T00:21:00.000Z",
+    "logId": 20000000000,
+    "logType": "auto_detected",
+    "manualValuesSpecified": {
+      "calories": false,
+      "distance": false,
+      "steps": false
+    },
+    "originalDuration": 615000,
+    "originalStartTime": "2017-02-27T08:57:14.000+09:00",
+    "shouldFetchDetails": false,
+    "startTime": "2017-02-27T08:57:14.000+09:00",
+    "steps": 954
+  }, {
+    "activeDuration": 1025000,
+    "activityLevel": [{
+      "minutes": 1,
+      "name": "sedentary"
+    }, {
+      "minutes": 6,
+      "name": "lightly"
+    }, {
+      "minutes": 2,
+      "name": "fairly"
+    }, {
+      "minutes": 8,
+      "name": "very"
+    }],
+    "activityName": "Walk",
+    "activityTypeId": 90013,
+    "calories": 90,
+    "duration": 1025000,
+    "elevationGain": 0,
+    "hasGps": false,
+    "lastModified": "2017-02-27T09:45:51.000Z",
+    "logId": 18857583588,
+    "logType": "auto_detected",
+    "manualValuesSpecified": {
+      "calories": false,
+      "distance": false,
+      "steps": false
+    },
+    "originalDuration": 1025000,
+    "originalStartTime": "2017-02-27T18:24:41.000+09:00",
+    "shouldFetchDetails": false,
+    "startTime": "2017-02-27T18:24:41.000+09:00",
+    "steps": 1398
+  }, {
+    "activeDuration": 717000,
+    "activityLevel": [{
+      "minutes": 0,
+      "name": "sedentary"
+    }, {
+      "minutes": 0,
+      "name": "lightly"
+    }, {
+      "minutes": 3,
+      "name": "fairly"
+    }, {
+      "minutes": 8,
+      "name": "very"
+    }],
+    "activityName": "Walk",
+    "activityTypeId": 90013,
+    "calories": 72,
+    "duration": 717000,
+    "elevationGain": 0,
+    "hasGps": false,
+    "lastModified": "2017-02-27T14:51:19.000Z",
+    "logId": 18862257706,
+    "logType": "auto_detected",
+    "manualValuesSpecified": {
+      "calories": false,
+      "distance": false,
+      "steps": false
+    },
+    "originalDuration": 717000,
+    "originalStartTime": "2017-02-27T23:30:12.000+09:00",
+    "shouldFetchDetails": false,
+    "startTime": "2017-02-27T23:30:12.000+09:00",
+    "steps": 1060
+  }],
+  "goals": {
+    "activeMinutes": 30,
+    "calories": 2516,
+    "distance": 8.05,
+    "distanceUnit": "Kilometer",
+    "floors": 10,
+    "steps": 10000
+  },
+  "summary": {
+    "activityLevels": [{
+      "distance": 0,
+      "minutes": 688,
+      "name": "sedentary"
+    }, {
+      "distance": 2.75,
+      "minutes": 202,
+      "name": "lightly"
+    }, {
+      "distance": 0.84,
+      "minutes": 16,
+      "name": "moderately"
+    }, {
+      "distance": 2.37,
+      "minutes": 28,
+      "name": "very"
+    }],
+    "calories": {
+      "bmr": 1501,
+      "total": 2351
+    },
+    "customHeartRateZones": [],
+    "distance": 5.97,
+    "elevation": 0,
+    "floors": 0,
+    "heartRateZones": [{
+      "caloriesOut": 1761.91488,
+      "max": 96,
+      "min": 30,
+      "minutes": 1290,
+      "name": "out of range"
+    }, {
+      "caloriesOut": 562.17348,
+      "max": 135,
+      "min": 96,
+      "minutes": 127,
+      "name": "fat burn"
+    },
+      {
+        "caloriesOut ": 0,
+        "max": 164,
+        "min": 135,
+        "minutes": 0,
+        "name": "cardio"
+      },
+      {
+        "caloriesOut ": 0,
+        "max": 220,
+        "min": 164,
+        "minutes": 0,
+        "name": "peak"
+      }
+    ],
+    "steps": 8085
+  }
+}

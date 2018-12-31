@@ -1,0 +1,19 @@
+@startuml
+
+actor User
+database Store
+
+User -> App : access /v1/fitbit2gcal
+App ->x Store : get token
+User <- App : return 401 if token is not stored in Store
+
+... if token exists and valid ...
+User -> App : access /v1/fitbit2gcal
+App -> Store : get token
+App -> Fitbit : get sleep, activity data
+App <- Fitbit : return data
+App -> GCal : save sleep, activity event
+App <- GCal : return ok
+User <- App : return ok
+
+@enduml

@@ -1,8 +1,11 @@
 package fitbit2gcal
 
+import "golang.org/x/oauth2"
+
 type GCalConfig struct {
 	SleepCalendarID    string
 	ActivityCalendarID string
+	OauthConfig *oauth2.Config
 }
 
 type Schedule struct {
@@ -63,7 +66,9 @@ type SleepLevelsDatapoint struct {
 
 type Activity struct {
 	Activities []ActivityData `json:"activities"`
-}
+	ActivityGoals ActivityGoals `json:"goals"`
+	ActivitySummary ActivitySummary `json:"summary"`
+ }
 
 type ActivityData struct {
 	ActivityID       int     `json:"activityId"`

@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"ghe.corp.yahoo.co.jp/pivotal-cf/cluster-spec/config"
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
-	calendar "google.golang.org/api/calendar/v3"
+	"google.golang.org/api/calendar/v3"
+	log "github.com/sirupsen/logrus"
 )
 
 type gcalClient struct {
@@ -29,20 +29,22 @@ func (gc *gcalClient) InsertEvent(event *calendar.Event, dataType string) error 
 	case "activity":
 		calID = gc.gcalConfig.ActivityCalendarID
 	default:
-		return errors.New("Unsupported data type")
+		return errors.New("error: unsupported data type")
 	}
 
 	token, err := gc.store.FetchGCalTokens()
 	if err != nil {
 		return err
 	}
-	cli := config.Client(context.Background(), token)
+
+	cli := gc.gcalConfig.OauthConfig.Client(context.Background(), token)
 	srv, err := calendar.New(cli)
 	if err != nil {
 		return err
 	}
 	_, err = srv.Events.Insert(calID, event).Do()
 	if err != nil {
+		log.Errorf("%v\n", err)
 		return err
 	}
 	return nil

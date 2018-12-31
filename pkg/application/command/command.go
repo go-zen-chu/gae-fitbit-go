@@ -2,7 +2,7 @@ package command
 
 import (
 	"fmt"
-	"io/ioutil"
+	"golang.org/x/oauth2"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -14,8 +14,7 @@ import (
 	if2g "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/fitbit2gcal"
 	ifba "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/fitbitauth"
 	iga "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/gcalauth"
-	"golang.org/x/oauth2/google"
-	calendar "google.golang.org/api/calendar/v3"
+	"google.golang.org/api/calendar/v3"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -43,10 +42,13 @@ var (
 	// fitbit options
 	fbClientID        = kingpin.Flag("fb-client-id", "Fitbit Client ID").Envar("GAE_FITBIT_GO_FITBIT_CLIENT_ID").String()
 	fbClientSecret    = kingpin.Flag("fb-client-secret", "Fitbit Client Secret").Envar("GAE_FITBIT_GO_FITBIT_CLIENT_SECRET").String()
-	fbAuthRedirectURI = kingpin.Flag("fb-auth-redirect-uri", "Fitbit auth redirect url").Envar("GAE_FITBIT_GO_FITBIT_AUTH_REDIRECT_URI").String()
+	fbAuthRedirectURI = kingpin.Flag("fb-auth-redirect-uri", "Fitbit auth redirect url").Default("http://127.0.0.1:8080/v1/fitbitstoretoken").Envar("GAE_FITBIT_GO_FITBIT_AUTH_REDIRECT_URI").String()
 	// gcal options
 	gcalSleepCalendarID    = kingpin.Flag("gcal-sleep-cal-id", "Google sleep calendar ID").Envar("GAE_FITBIT_GO_FITBIT_GCAL_SLEEP_CAL_ID").String()
 	gcalActivityCalendarID = kingpin.Flag("gcal-activity-cal-id", "Google activity calendar ID").Envar("GAE_FITBIT_GO_FITBIT_GCAL_ACTIVITY_CAL_ID").String()
+	gcalClientID        = kingpin.Flag("gcal-client-id", "Google Calendar Client ID").Envar("GAE_FITBIT_GO_GCAL_CLIENT_ID").String()
+	gcalClientSecret        = kingpin.Flag("gcal-client-secret", "Google Calendar Client Secret").Envar("GAE_FITBIT_GO_GCAL_CLIENT_SECRET").String()
+	gcalAuthRedirectURI = kingpin.Flag("gcal-auth-redirect-uri", "GCal auth redirect url").Default("http://localhost:8080/v1/gcalstoretoken").Envar("GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI").String()
 )
 
 // Run() : runs http api with specified config
@@ -79,20 +81,23 @@ func (c *command) Run() error {
 	fbaFactory := ifba.NewFactory()
 	fbaHandler := fbaFactory.FitbitAuthHandler(fitbitAuthParams, fitbitTokenParams)
 
-	credBytes, err := ioutil.ReadFile("credentials.json")
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
-	config, err := google.ConfigFromJSON(credBytes, calendar.CalendarReadonlyScope)
-	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+	oauthConfig := &oauth2.Config{
+		ClientID: *gcalClientID,
+		ClientSecret: *gcalClientSecret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL: "https://accounts.google.com/o/oauth2/auth",
+			TokenURL: "https://www.googleapis.com/oauth2/v3/token",
+		},
+		RedirectURL: *gcalAuthRedirectURI,
+		Scopes: []string { calendar.CalendarEventsScope },
 	}
 	gaFactory := iga.NewFactory()
-	gaHandler := dga.NewGCalAuthHandler(gaFactory, config)
+	gaHandler := dga.NewGCalAuthHandler(gaFactory, oauthConfig)
 
 	gcalConfig := &df2g.GCalConfig{
 		SleepCalendarID:    *gcalSleepCalendarID,
 		ActivityCalendarID: *gcalActivityCalendarID,
+		OauthConfig: oauthConfig,
 	}
 	f2gFactory := if2g.NewFactory()
 	f2gService := f2gFactory.Service(gcalConfig)

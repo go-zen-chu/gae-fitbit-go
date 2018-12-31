@@ -208,14 +208,12 @@ func convertActivity2Events(activity *Activity) ([]calendar.Event, error) {
 
 		durationHour, durationMin := duration2HourMin(duration)
 
-		summary := fmt.Sprintf("%s %02d:%02d", a.Name, durationHour, durationMin)
+		summary := fmt.Sprintf("%s %02d:%02d", a.ActivityName, durationHour, durationMin)
 		desc := fmt.Sprintf("Calories : %d\n" +
-			"Distance : %f\n" +
 			"Duration : %02d:%02d\n" +
 			"Steps : %d\n" +
 			"LogID : %d\n",
 			a.Calories,
-			a.Distance,
 			durationHour, durationMin,
 			a.Steps,
 			a.LogID)

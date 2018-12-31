@@ -5,7 +5,7 @@ import "golang.org/x/oauth2"
 type GCalConfig struct {
 	SleepCalendarID    string
 	ActivityCalendarID string
-	OauthConfig *oauth2.Config
+	OauthConfig        *oauth2.Config
 }
 
 type Schedule struct {
@@ -65,48 +65,64 @@ type SleepLevelsDatapoint struct {
 }
 
 type Activity struct {
-	Activities []ActivityData `json:"activities"`
-	ActivityGoals ActivityGoals `json:"goals"`
+	Activities      []ActivityData  `json:"activities"`
+	ActivityGoals   ActivityGoals   `json:"goals"`
 	ActivitySummary ActivitySummary `json:"summary"`
- }
+}
 
 type ActivityData struct {
-	ActivityID       int     `json:"activityId"`
-	ActivityParentID int     `json:"activityParentId"`
-	Calories         int     `json:"calories"`
-	Description      string  `json:"description"`
-	Distance         float32 `json:"distance"`
-	Duration         int     `json:"duration"`
-	IsFavorite       bool    `json:"isFavorite"`
-	LogID            int     `json:"logId"`
-	Name             string  `json:"name"`
-	StartTime        string  `json:"startTime"`
-	Steps            int     `json:"steps"`
+	ActivityID        int             `json:"activityId"`
+	ActiveDuration    int             `json:"activeDuration"`
+	ActivityLevel     []ActivityLevel `json:"activityLevel"`
+	ActivityName      string          `json:"activityName"`
+	ActivityTypeID    int             `json:"activityTypeId"`
+	Calories          int             `json:"calories"`
+	Duration          int             `json:"duration"`
+	ElevationGain     int             `json:"elevationGain"`
+	HasGPS            bool            `json:"hasGps"`
+	LastModified      string          `json:"lastModified"`
+	LogID             int             `json:"logId"`
+	LogType           string             `json:"logType"`
+	OriginalDuration  int             `json:"originalDuration"`
+	OriginalStartTime string          `json:"originakStartTime"`
+	StartTime         string          `json:"startTime"`
+	Steps             int             `json:"steps"`
 }
 
 type ActivityGoals struct {
-	CaloriesOut int     `json:"caloriesOut"`
-	Distance    float32 `json:"distance"`
-	Floors      int     `json:"floors"`
-	Steps       int     `json:"steps"`
+	ActiveMinutes int     `json:"activeMinutes"`
+	Calories      int     `json:"calories"`
+	Distance      float32 `json:"distance"`
+	DistanceUnit  string  `json:"distanceUnit"`
+	Floors        int     `json:"floors"`
+	Steps         int     `json:"steps"`
+}
+
+type ActivityLevel struct {
+	Distance float32 `json:"distance"`
+	Minutes  int     `json:"minutes"`
+	Name     string  `json:"name"`
 }
 
 type ActivitySummary struct {
-	ActivityCalories     int                `json:"activityCalories"`
-	CaloriesBMR          int                `json:"caloriesBMR"`
-	CaloriesOut          int                `json:"caloriesOut"`
-	Distances            []ActivityDistance `json:"distances"`
-	Elevation            float32            `json:"elevation"`
-	FairlyActiveMinutes  int                `json:"fairlyActiveMinutes"`
-	Floors               int                `json:"floors"`
-	LightlyActiveMinutes int                `json:"lightlyActiveMinutes"`
-	MarginalCalories     int                `json:"marginalCalories"`
-	SedentaryMinutes     int                `json:"sedentaryMinutes"`
-	Steps                int                `json:"steps"`
-	VeryActiveMinutes    int                `json:"veryActiveMinutes"`
+	ActivityLevels []ActivityLevel         `json:"activityLevels"`
+	Calories       ActivityCalories        `json:"calories"`
+	Distance       float32                 `json:"distance"`
+	Elevation      float32                 `json:"elevation"`
+	Floors         int                     `json:"floors"`
+	HeartRateZones []ActivityHeartRateZone `json:"heartRateZones"`
+	Steps          int                     `json:"steps"`
 }
 
-type ActivityDistance struct {
-	Activity string  `json:"activity"`
-	Distance float32 `json:"distance"`
+type ActivityCalories struct {
+	BMR   int `json:"bmr"`
+	Total int `json:"total"`
+}
+
+type ActivityHeartRateZone struct {
+	CaloriesOut float32 `json:"caloriesOut"`
+	Max         int     `json:"max"`
+	Min         int     `json:"min"`
+	Minutes     int     `json:"minutes"`
+	Name        string  `json:"name"`
 }

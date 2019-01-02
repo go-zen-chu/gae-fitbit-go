@@ -2,6 +2,7 @@ package gcalauth
 
 import (
 	dga "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
+	"golang.org/x/oauth2"
 )
 
 type factory struct{}
@@ -15,6 +16,6 @@ func (f *factory) FileStore() (dga.Store, error) {
 	return fs, nil
 }
 
-// func (f *factory) FitbitAuthHandler(fap *dfba.FitbitAuthParams, ftp *dfba.FitbitTokenParams) dfba.FitbitAuthHandler {
-// 	return dfba.NewFitbitAuthHandler(f, fap, ftp)
-// }
+func (f *factory) GCalAuthHandler(oauthConfig *oauth2.Config) dga.GCalAuthHandler {
+	return dga.NewGCalAuthHandler(f, oauthConfig)
+}

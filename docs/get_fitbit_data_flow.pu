@@ -3,13 +3,21 @@
 actor User
 database Store
 
+... if token is not stored in store ...
 User -> App : access /v1/fitbit2gcal
 App ->x Store : get token
-User <- App : return 401 if token is not stored in Store
+User <- App : return 401
+
+... if token exists but expired ...
+User -> App : access /v1/fitbit2gcal
+App -> Store : get token
+App x<- App : check token is not expired
+App -> Fitbit : request for new token
 
 ... if token exists and valid ...
 User -> App : access /v1/fitbit2gcal
 App -> Store : get token
+App <- App : check token is not expired
 App -> Fitbit : get sleep, activity data
 App <- Fitbit : return data
 App -> GCal : save sleep, activity event

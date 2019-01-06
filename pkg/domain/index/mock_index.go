@@ -35,10 +35,12 @@ func (m *MockIndexHandler) EXPECT() *MockIndexHandlerMockRecorder {
 
 // HandleIndex mocks base method
 func (m *MockIndexHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
+	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "HandleIndex", w, r)
 }
 
 // HandleIndex indicates an expected call of HandleIndex
 func (mr *MockIndexHandlerMockRecorder) HandleIndex(w, r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleIndex", reflect.TypeOf((*MockIndexHandler)(nil).HandleIndex), w, r)
 }

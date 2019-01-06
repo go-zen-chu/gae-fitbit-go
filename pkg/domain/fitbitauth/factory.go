@@ -5,4 +5,5 @@ package fitbitauth
 type Factory interface {
 	FileStore() (Store, error)
 	FitbitAuthHandler(fap *FitbitAuthParams, ftp *FitbitTokenParams) FitbitAuthHandler
+	FitbitHTTPClient() FitbitHTTPClient
 }

@@ -35,6 +35,7 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 
 // WriteGCalTokens mocks base method
 func (m *MockStore) WriteGCalTokens(token *oauth2.Token) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriteGCalTokens", token)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -42,11 +43,13 @@ func (m *MockStore) WriteGCalTokens(token *oauth2.Token) error {
 
 // WriteGCalTokens indicates an expected call of WriteGCalTokens
 func (mr *MockStoreMockRecorder) WriteGCalTokens(token interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteGCalTokens", reflect.TypeOf((*MockStore)(nil).WriteGCalTokens), token)
 }
 
 // FetchGCalTokens mocks base method
 func (m *MockStore) FetchGCalTokens() (*oauth2.Token, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FetchGCalTokens")
 	ret0, _ := ret[0].(*oauth2.Token)
 	ret1, _ := ret[1].(error)
@@ -55,5 +58,6 @@ func (m *MockStore) FetchGCalTokens() (*oauth2.Token, error) {
 
 // FetchGCalTokens indicates an expected call of FetchGCalTokens
 func (mr *MockStoreMockRecorder) FetchGCalTokens() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchGCalTokens", reflect.TypeOf((*MockStore)(nil).FetchGCalTokens))
 }

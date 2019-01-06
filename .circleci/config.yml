@@ -1,0 +1,33 @@
+version: 2 # use CircleCI 2.0
+jobs:
+  build:
+    docker:
+      # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
+      - image: circleci/golang:1.11.4
+    working_directory: /go/src/github.com/go-zen-chu/gae-fitbit-go
+
+#    environment: # environment variables for the build itself
+#      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+
+    steps: # steps that comprise the `build` job
+      - checkout # check out source code to working directory
+      - run:
+          name: "Solve dependency"
+          command: |
+            # get environment info
+            pwd; ls;
+            echo "HOME= $HOME"
+            echo "GOPATH= $GOPATH"
+            echo "PATH= $PATH"
+
+            # install test tools
+            go get github.com/onsi/gomega/...
+            go get github.com/onsi/ginkgo/ginkgo
+
+            # solve dependency
+            dep ensure
+      - run:
+          name: "Run test"
+          command: |
+            ginkgo -r -v .
+

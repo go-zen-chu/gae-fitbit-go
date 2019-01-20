@@ -18,3 +18,7 @@ func (f *factory) FileStore() (dfba.Store, error) {
 func (f *factory) FitbitAuthHandler(fap *dfba.FitbitAuthParams, ftp *dfba.FitbitTokenParams) dfba.FitbitAuthHandler {
 	return dfba.NewFitbitAuthHandler(f, fap, ftp)
 }
+
+func (f *factory) FitbitHTTPClient() dfba.FitbitHTTPClient {
+	return NewFitbitHTTPClient()
+}

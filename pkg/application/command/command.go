@@ -110,9 +110,11 @@ func (c *command) Run() error {
 	http.HandleFunc("/index.html", c.indexHandler.HandleIndex)
 	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fbaHandler.Redirect2Fitbit)
 	http.HandleFunc(fmt.Sprintf("/%s/fitbitstoretoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
+	http.HandleFunc(fmt.Sprintf("/%s/fitbitupdatetoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
 	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
 	http.HandleFunc(fmt.Sprintf("/%s/gcalauth", apiVersion), gaHandler.Redirect2GCal)
 	http.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), gaHandler.HandleGCalAuthCode)
+	http.HandleFunc(fmt.Sprintf("/%s/gcalupdatetoken", apiVersion), fbaHandler.HandleGCalAuthCode)
 
 	log.Infof("Running gae-fitbit-go on : %s", *port)
 	return c.httpserver.Run(*port)

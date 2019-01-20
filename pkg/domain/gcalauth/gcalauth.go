@@ -15,6 +15,7 @@ import (
 type GCalAuthHandler interface {
 	Redirect2GCal(w http.ResponseWriter, r *http.Request)
 	HandleGCalAuthCode(w http.ResponseWriter, r *http.Request)
+	HandleUpdateGCalToken(w http.ResponseWriter, r *http.Request)
 }
 
 type gcalAuthHandler struct {
@@ -75,4 +76,8 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 
 	log.Info("Success storing gcal tokens")
 	fmt.Fprintf(w, "OK")
+}
+
+func (gah *gcalAuthHandler) HandleUpdateGCalToken(w http.ResponseWriter, r *http.Request){
+
 }

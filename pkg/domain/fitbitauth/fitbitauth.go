@@ -14,6 +14,7 @@ import (
 type FitbitAuthHandler interface {
 	Redirect2Fitbit(w http.ResponseWriter, r *http.Request)
 	HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request)
+	HandleUpdateFitbitToken(w http.ResponseWriter, r *http.Request)
 }
 
 type fitbitAuthHandler struct {
@@ -94,4 +95,9 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 	}
 	log.Info("Success storing fitbit tokens")
 	fmt.Fprintf(w, "OK")
+}
+
+func (fah *fitbitAuthHandler) HandleUpdateFitbitToken(w http.ResponseWriter, r *http.Request) {
+	fst, err := fah.factory.FileStore()
+
 }

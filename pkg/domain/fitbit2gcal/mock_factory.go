@@ -5,6 +5,8 @@
 package fitbit2gcal
 
 import (
+	fitbitauth "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
+	gcalauth "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -33,50 +35,55 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 }
 
 // Service mocks base method
-func (m *MockFactory) Service(gcalConfig *GCalConfig) Service {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Service", gcalConfig)
+func (m *MockFactory) Service(fitbitConfig *FitbitConfig, gcalConfig *GCalConfig) Service {
+	ret := m.ctrl.Call(m, "Service", fitbitConfig, gcalConfig)
 	ret0, _ := ret[0].(Service)
 	return ret0
 }
 
 // Service indicates an expected call of Service
-func (mr *MockFactoryMockRecorder) Service(gcalConfig interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockFactory)(nil).Service), gcalConfig)
+func (mr *MockFactoryMockRecorder) Service(fitbitConfig, gcalConfig interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockFactory)(nil).Service), fitbitConfig, gcalConfig)
 }
 
-// FileStore mocks base method
-func (m *MockFactory) FileStore() Store {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FileStore")
-	ret0, _ := ret[0].(Store)
+// FitbitFileStore mocks base method
+func (m *MockFactory) FitbitFileStore() fitbitauth.Store {
+	ret := m.ctrl.Call(m, "FitbitFileStore")
+	ret0, _ := ret[0].(fitbitauth.Store)
 	return ret0
 }
 
-// FileStore indicates an expected call of FileStore
-func (mr *MockFactoryMockRecorder) FileStore() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FileStore", reflect.TypeOf((*MockFactory)(nil).FileStore))
+// FitbitFileStore indicates an expected call of FitbitFileStore
+func (mr *MockFactoryMockRecorder) FitbitFileStore() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FitbitFileStore", reflect.TypeOf((*MockFactory)(nil).FitbitFileStore))
+}
+
+// GCalFileStore mocks base method
+func (m *MockFactory) GCalFileStore() gcalauth.Store {
+	ret := m.ctrl.Call(m, "GCalFileStore")
+	ret0, _ := ret[0].(gcalauth.Store)
+	return ret0
+}
+
+// GCalFileStore indicates an expected call of GCalFileStore
+func (mr *MockFactoryMockRecorder) GCalFileStore() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GCalFileStore", reflect.TypeOf((*MockFactory)(nil).GCalFileStore))
 }
 
 // FitbitClient mocks base method
-func (m *MockFactory) FitbitClient(store Store) FitbitClient {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FitbitClient", store)
+func (m *MockFactory) FitbitClient(store fitbitauth.Store, fitbitConfig *FitbitConfig) FitbitClient {
+	ret := m.ctrl.Call(m, "FitbitClient", store, fitbitConfig)
 	ret0, _ := ret[0].(FitbitClient)
 	return ret0
 }
 
 // FitbitClient indicates an expected call of FitbitClient
-func (mr *MockFactoryMockRecorder) FitbitClient(store interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FitbitClient", reflect.TypeOf((*MockFactory)(nil).FitbitClient), store)
+func (mr *MockFactoryMockRecorder) FitbitClient(store, fitbitConfig interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FitbitClient", reflect.TypeOf((*MockFactory)(nil).FitbitClient), store, fitbitConfig)
 }
 
 // GCalClient mocks base method
-func (m *MockFactory) GCalClient(store Store, gcalConfig *GCalConfig) GCalClient {
-	m.ctrl.T.Helper()
+func (m *MockFactory) GCalClient(store gcalauth.Store, gcalConfig *GCalConfig) GCalClient {
 	ret := m.ctrl.Call(m, "GCalClient", store, gcalConfig)
 	ret0, _ := ret[0].(GCalClient)
 	return ret0
@@ -84,6 +91,5 @@ func (m *MockFactory) GCalClient(store Store, gcalConfig *GCalConfig) GCalClient
 
 // GCalClient indicates an expected call of GCalClient
 func (mr *MockFactoryMockRecorder) GCalClient(store, gcalConfig interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GCalClient", reflect.TypeOf((*MockFactory)(nil).GCalClient), store, gcalConfig)
 }

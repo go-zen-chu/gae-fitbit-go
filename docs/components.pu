@@ -1,0 +1,76 @@
+@startuml
+
+interface fitbitauth.Factory {
+    +FileStore() (Store, error)
+    +FitbitAuthHandler(config *oauth2.Config) FitbitAuthHandler
+    +OAuthClient() OAuthClient
+}
+interface fitbitauth.OAuthClient {
+	+GetAuthCodeURL() string
+	+Exchange(authCode string) (*oauth2.Token, error)
+}
+interface fitbitauth.Store {
+    +WriteFitbitToken(token *oauth2.Token) error
+    +FetchFitbitToken() (*oauth2.Token, error)
+}
+interface fitbitauth.FitbitAuthHandler {
+    +Redirect2Fitbit(w http.ResponseWriter, r *http.Request)
+	+HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request)
+}
+
+fitbitauth.FitbitAuthHandler ..> fitbitauth.Factory
+fitbitauth.Factory --> fitbitauth.FitbitAuthHandler : gen
+fitbitauth.Factory --> fitbitauth.Store : gen
+fitbitauth.Factory --> fitbitauth.OAuthClient : gen
+
+
+interface gcalauth.Factory {
+    +FileStore() (Store, error)
+    +GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandler
+
+}
+interface gcalauth.OAuthClient {
+	+GetAuthCodeURL() string
+	+Exchange(authCode string) (*oauth2.Token, error)
+}
+interface gcalauth.Store {
+    +WriteGCalToken(token *oauth2.Token) error
+    +FetchGCalToken() (*oauth2.Token, error)
+}
+interface gcalauth.GCalAuthHandler {
+	+Redirect2GCal(w http.ResponseWriter, r *http.Request)
+	+HandleGCalAuthCode(w http.ResponseWriter, r *http.Request)
+}
+
+gcalauth.GCalAuthHandler ..> gcalauth.Factory
+gcalauth.Factory --> gcalauth.GCalAuthHandler : gen 
+gcalauth.Factory --> gcalauth.Store : gen
+gcalauth.Factory --> gcalauth.OAuthClient : gen
+
+
+interface fitbit2gcal.Factory {
+    +Service(fitbitConfig *FitbitConfig, gcalConfig *GCalConfig) Service
+    +FitbitFileStore() dfba.Store
+    +GCalFileStore() dga.Store
+    +FitbitClient(store dfba.Store, fitbitConfig *FitbitConfig) FitbitClient
+    +GCalClient(store dga.Store, gcalConfig *GCalConfig) GCalClient
+}
+interface fitbit2gcal.Service {
+    +HandleFitbit2GCal(w http.ResponseWriter, r *http.Request)
+}
+interface fitbit2gcal.FitbitClient {
+    +GetSleepData(dateStr string) (*Sleep, error)
+    +GetActivityData(dateStr string) (*Activity, error)
+}
+interface fitbit2gcal.GCalClient {
+    +InsertEvent(event *calendar.Event, dataType string) error
+}
+
+fitbit2gcal.Service ..> fitbit2gcal.Factory
+fitbit2gcal.Factory --> fitbit2gcal.Service : gen
+fitbit2gcal.Factory --> fitbitauth.Store : gen
+fitbit2gcal.Factory --> gcalauth.Store : gen
+fitbit2gcal.Factory --> fitbit2gcal.FitbitClient : gen
+fitbit2gcal.Factory --> fitbit2gcal.GCalClient : gen
+
+@enduml

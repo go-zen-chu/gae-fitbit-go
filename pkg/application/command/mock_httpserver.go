@@ -34,7 +34,6 @@ func (m *MockHttpServer) EXPECT() *MockHttpServerMockRecorder {
 
 // Run mocks base method
 func (m *MockHttpServer) Run(port string) error {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Run", port)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -42,6 +41,5 @@ func (m *MockHttpServer) Run(port string) error {
 
 // Run indicates an expected call of Run
 func (mr *MockHttpServerMockRecorder) Run(port interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockHttpServer)(nil).Run), port)
 }

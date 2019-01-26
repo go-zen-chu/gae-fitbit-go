@@ -55,9 +55,9 @@ var _ = Describe("command", func() {
 		var cmd command.Command
 
 		BeforeEach(func() {
-			mfaf.EXPECT().FitbitAuthHandler(gomock.Any(), gomock.Any()).Return(mfah)
+			mfaf.EXPECT().FitbitAuthHandler(gomock.Any()).Return(mfah)
 			mgaf.EXPECT().GCalAuthHandler(gomock.Any()).Return(mgah)
-			mf2gf.EXPECT().Service(gomock.Any()).Return(mf2gs)
+			mf2gf.EXPECT().Service(gomock.Any(), gomock.Any()).Return(mf2gs)
 
 			mhs.EXPECT().Run("9091").Return(nil)
 

@@ -35,24 +35,20 @@ func (m *MockFitbitAuthHandler) EXPECT() *MockFitbitAuthHandlerMockRecorder {
 
 // Redirect2Fitbit mocks base method
 func (m *MockFitbitAuthHandler) Redirect2Fitbit(w http.ResponseWriter, r *http.Request) {
-	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Redirect2Fitbit", w, r)
 }
 
 // Redirect2Fitbit indicates an expected call of Redirect2Fitbit
 func (mr *MockFitbitAuthHandlerMockRecorder) Redirect2Fitbit(w, r interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Redirect2Fitbit", reflect.TypeOf((*MockFitbitAuthHandler)(nil).Redirect2Fitbit), w, r)
 }
 
 // HandleFitbitAuthCode mocks base method
 func (m *MockFitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request) {
-	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "HandleFitbitAuthCode", w, r)
 }
 
 // HandleFitbitAuthCode indicates an expected call of HandleFitbitAuthCode
 func (mr *MockFitbitAuthHandlerMockRecorder) HandleFitbitAuthCode(w, r interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleFitbitAuthCode", reflect.TypeOf((*MockFitbitAuthHandler)(nil).HandleFitbitAuthCode), w, r)
 }

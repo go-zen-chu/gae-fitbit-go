@@ -3,11 +3,10 @@ package fitbitauth
 
 import (
 	"fmt"
-	"net/http"
-	"net/url"
-
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
+	"net/http"
 )
 
 // FitbitAuthHandler : Manage any authorization process against Fitbit API
@@ -18,40 +17,25 @@ type FitbitAuthHandler interface {
 
 type fitbitAuthHandler struct {
 	factory           Factory
-	fitbitAuthParams  *FitbitAuthParams
-	fitbitTokenParams *FitbitTokenParams
+	oauthConfig *oauth2.Config
+	oauthClient            OAuthClient
 }
 
-func NewFitbitAuthHandler(fbaf Factory, fap *FitbitAuthParams, ftp *FitbitTokenParams) FitbitAuthHandler {
+func NewFitbitAuthHandler(fbaf Factory, oauthConfig *oauth2.Config) FitbitAuthHandler {
+	oauthClient := fbaf.OAuthClient(oauthConfig)
 	return &fitbitAuthHandler{
 		factory:           fbaf,
-		fitbitAuthParams:  fap,
-		fitbitTokenParams: ftp,
+		oauthConfig: oauthConfig,
+		oauthClient: oauthClient,
 	}
 }
 
 // Redirect to Fitbit's oauth url
 func (fah *fitbitAuthHandler) Redirect2Fitbit(w http.ResponseWriter, r *http.Request) {
-	redirectURL := createFitbitAuthURL(fah.fitbitAuthParams)
-	http.Redirect(w, r, redirectURL.String(), http.StatusSeeOther)
+	authURL := fah.oauthClient.GetAuthCodeURL()
+	http.Redirect(w, r, authURL, http.StatusSeeOther)
 }
 
-// createFitbitAuthURL : Generate Fitbit's oauth authorization flow url
-func createFitbitAuthURL(fap *FitbitAuthParams) *url.URL {
-	u := &url.URL{}
-	u.Scheme = "https"
-	u.Host = "www.fitbit.com"
-	u.Path = "/oauth2/authorize"
-	q := u.Query()
-	q.Set("client_id", fap.ClientID)
-	q.Set("redirect_uri", fap.RedirectURI)
-	q.Set("scope", fap.Scope)
-	q.Set("expires_in", fap.Expires)
-	q.Set("response_type", fap.ResponseType)
-	u.RawQuery = q.Encode()
-	log.Debugf("create fitbit auth url : %s", u.String())
-	return u
-}
 
 // HandleFitbitAuthCode : Will recieve auth code from Fitbit, store it
 func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request) {
@@ -75,9 +59,7 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 		return
 	}
 
-	fhc := fah.factory.FitbitHTTPClient()
-
-	ft, err := fhc.GetFitbitToken(fah.fitbitTokenParams, code)
+	token, err := fah.oauthClient.Exchange(code)
 	if err != nil {
 		err = errors.Wrap(err, "Error while getting token")
 		log.Errorln(err)
@@ -85,7 +67,7 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 		return
 	}
 
-	err = fst.WriteFitbitTokens(ft)
+	err = fst.WriteFitbitToken(token)
 	if err != nil {
 		err = errors.Wrap(err, "Error while storing token")
 		log.Errorln(err)

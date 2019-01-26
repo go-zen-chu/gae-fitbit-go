@@ -2,6 +2,7 @@ package fitbitauth
 
 import (
 	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
+	"golang.org/x/oauth2"
 )
 
 type factory struct{}
@@ -15,10 +16,10 @@ func (f *factory) FileStore() (dfba.Store, error) {
 	return fs, nil
 }
 
-func (f *factory) FitbitAuthHandler(fap *dfba.FitbitAuthParams, ftp *dfba.FitbitTokenParams) dfba.FitbitAuthHandler {
-	return dfba.NewFitbitAuthHandler(f, fap, ftp)
+func (f *factory) FitbitAuthHandler(config *oauth2.Config) dfba.FitbitAuthHandler {
+	return dfba.NewFitbitAuthHandler(f, config)
 }
 
-func (f *factory) FitbitHTTPClient() dfba.FitbitHTTPClient {
-	return NewFitbitHTTPClient()
+func (f *factory) OAuthClient(config *oauth2.Config) dfba.OAuthClient {
+	return NewOAuthClient(config)
 }

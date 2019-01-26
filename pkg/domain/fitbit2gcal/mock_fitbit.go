@@ -34,7 +34,6 @@ func (m *MockFitbitClient) EXPECT() *MockFitbitClientMockRecorder {
 
 // GetSleepData mocks base method
 func (m *MockFitbitClient) GetSleepData(dateStr string) (*Sleep, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSleepData", dateStr)
 	ret0, _ := ret[0].(*Sleep)
 	ret1, _ := ret[1].(error)
@@ -43,13 +42,11 @@ func (m *MockFitbitClient) GetSleepData(dateStr string) (*Sleep, error) {
 
 // GetSleepData indicates an expected call of GetSleepData
 func (mr *MockFitbitClientMockRecorder) GetSleepData(dateStr interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSleepData", reflect.TypeOf((*MockFitbitClient)(nil).GetSleepData), dateStr)
 }
 
 // GetActivityData mocks base method
 func (m *MockFitbitClient) GetActivityData(dateStr string) (*Activity, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetActivityData", dateStr)
 	ret0, _ := ret[0].(*Activity)
 	ret1, _ := ret[1].(error)
@@ -58,6 +55,5 @@ func (m *MockFitbitClient) GetActivityData(dateStr string) (*Activity, error) {
 
 // GetActivityData indicates an expected call of GetActivityData
 func (mr *MockFitbitClientMockRecorder) GetActivityData(dateStr interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActivityData", reflect.TypeOf((*MockFitbitClient)(nil).GetActivityData), dateStr)
 }

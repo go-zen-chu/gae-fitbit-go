@@ -17,5 +17,13 @@ func (f *factory) FileStore() (dga.Store, error) {
 }
 
 func (f *factory) GCalAuthHandler(oauthConfig *oauth2.Config) dga.GCalAuthHandler {
-	return dga.NewGCalAuthHandler(f, oauthConfig)
+	return dga.NewGCalAuthHandler(f,oauthConfig)
+}
+
+func (f *factory) NewOAuthClient(oauthConfig *oauth2.Config) dga.OAuthClient {
+	return NewOAuthClient(oauthConfig)
+}
+
+func (f *factory) OAuthClient(config *oauth2.Config) dga.OAuthClient {
+	return NewOAuthClient(config)
 }

@@ -7,4 +7,5 @@ import "golang.org/x/oauth2"
 type Factory interface {
 	FileStore() (Store, error)
 	GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandler
+	OAuthClient(config *oauth2.Config) OAuthClient
 }

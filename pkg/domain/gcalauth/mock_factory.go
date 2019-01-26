@@ -35,7 +35,6 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 
 // FileStore mocks base method
 func (m *MockFactory) FileStore() (Store, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FileStore")
 	ret0, _ := ret[0].(Store)
 	ret1, _ := ret[1].(error)
@@ -44,13 +43,11 @@ func (m *MockFactory) FileStore() (Store, error) {
 
 // FileStore indicates an expected call of FileStore
 func (mr *MockFactoryMockRecorder) FileStore() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FileStore", reflect.TypeOf((*MockFactory)(nil).FileStore))
 }
 
 // GCalAuthHandler mocks base method
 func (m *MockFactory) GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandler {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GCalAuthHandler", oauthConfig)
 	ret0, _ := ret[0].(GCalAuthHandler)
 	return ret0
@@ -58,6 +55,17 @@ func (m *MockFactory) GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandle
 
 // GCalAuthHandler indicates an expected call of GCalAuthHandler
 func (mr *MockFactoryMockRecorder) GCalAuthHandler(oauthConfig interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GCalAuthHandler", reflect.TypeOf((*MockFactory)(nil).GCalAuthHandler), oauthConfig)
+}
+
+// OAuthClient mocks base method
+func (m *MockFactory) OAuthClient(config *oauth2.Config) OAuthClient {
+	ret := m.ctrl.Call(m, "OAuthClient", config)
+	ret0, _ := ret[0].(OAuthClient)
+	return ret0
+}
+
+// OAuthClient indicates an expected call of OAuthClient
+func (mr *MockFactoryMockRecorder) OAuthClient(config interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OAuthClient", reflect.TypeOf((*MockFactory)(nil).OAuthClient), config)
 }

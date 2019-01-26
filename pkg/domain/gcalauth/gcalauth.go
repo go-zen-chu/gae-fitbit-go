@@ -2,7 +2,6 @@
 package gcalauth
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -15,24 +14,26 @@ import (
 type GCalAuthHandler interface {
 	Redirect2GCal(w http.ResponseWriter, r *http.Request)
 	HandleGCalAuthCode(w http.ResponseWriter, r *http.Request)
-	HandleUpdateGCalToken(w http.ResponseWriter, r *http.Request)
 }
 
 type gcalAuthHandler struct {
 	factory Factory
-	config  *oauth2.Config
+	oauthConfig *oauth2.Config
+	oauthClient  OAuthClient
 }
 
-func NewGCalAuthHandler(gaf Factory, config *oauth2.Config) GCalAuthHandler {
+func NewGCalAuthHandler(gaf Factory, oauthConfig *oauth2.Config) GCalAuthHandler {
+	oauthClient := gaf.OAuthClient(oauthConfig)
 	return &gcalAuthHandler{
 		factory: gaf,
-		config:  config,
+		oauthConfig: oauthConfig,
+		oauthClient: oauthClient,
 	}
 }
 
 // Redirect to GCal's oauth url
 func (gah *gcalAuthHandler) Redirect2GCal(w http.ResponseWriter, r *http.Request) {
-	authURL := gah.config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	authURL := gah.oauthClient.GetAuthCodeURL()
 	http.Redirect(w, r, authURL, http.StatusSeeOther)
 }
 
@@ -50,15 +51,15 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 	code := keys[0]
 	log.Debugf("auth code :%s", code)
 
-	fst, _ := gah.factory.FileStore()
-	// if err != nil {
-	// 	err = errors.Wrap(err, "Error while getting store")
-	// 	log.Errorln(err)
-	// 	http.Error(w, err.Error(), 500)
-	// 	return
-	// }
+	fst, err := gah.factory.FileStore()
+	if err != nil {
+		err = errors.Wrap(err, "Error while getting store")
+		log.Errorln(err)
+		http.Error(w, err.Error(), 500)
+		return
+	}
 
-	token, err := gah.config.Exchange(context.TODO(), code)
+	token, err := gah.oauthClient.Exchange(code)
 	if err != nil {
 		err = errors.Wrap(err, "Error while getting token")
 		log.Errorln(err)
@@ -66,7 +67,7 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	err = fst.WriteGCalTokens(token)
+	err = fst.WriteGCalToken(token)
 	if err != nil {
 		err = errors.Wrap(err, "Error while storing token")
 		log.Errorln(err)
@@ -76,8 +77,4 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 
 	log.Info("Success storing gcal tokens")
 	fmt.Fprintf(w, "OK")
-}
-
-func (gah *gcalAuthHandler) HandleUpdateGCalToken(w http.ResponseWriter, r *http.Request){
-
 }

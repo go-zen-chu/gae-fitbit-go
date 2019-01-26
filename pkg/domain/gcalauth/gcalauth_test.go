@@ -1,4 +1,4 @@
-package fitbitauth
+package gcalauth
 
 import (
 	"github.com/golang/mock/gomock"
@@ -6,19 +6,20 @@ import (
 	. "github.com/onsi/gomega"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/fitbit"
+	"google.golang.org/api/calendar/v3"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"time"
 )
 
-var _ = Describe("fitbitauth", func() {
+var _ = Describe("gcalauth", func() {
 	var (
 		c     *gomock.Controller
 		mf *MockFactory
 		ms *MockStore
 		moc *MockOAuthClient
-		fah   FitbitAuthHandler
+		gah   GCalAuthHandler
 		config *oauth2.Config
 		token    *oauth2.Token
 	)
@@ -30,11 +31,11 @@ var _ = Describe("fitbitauth", func() {
 		moc = NewMockOAuthClient(c)
 
 		config = &oauth2.Config{
-			ClientID: "fb-client-id",
-			ClientSecret: "fb-client-secret",
+			ClientID: "gcal-client-id",
+			ClientSecret: "gcal-client-secret",
 			Endpoint: fitbit.Endpoint,
-			RedirectURL: "http://127.0.0.1:8080/v1/fitbitstoretoken",
-			Scopes: []string { "sleep", "activity" },
+			RedirectURL: "http://127.0.0.1:8080/v1/gcalstoretoken",
+			Scopes: []string { calendar.CalendarEventsScope },
 		}
 		token = &oauth2.Token{
 			AccessToken:  "access-token",
@@ -45,15 +46,15 @@ var _ = Describe("fitbitauth", func() {
 		mf.EXPECT().FileStore().Return(ms, nil)
 		mf.EXPECT().OAuthClient(config).Return(moc)
 
-		fah = NewFitbitAuthHandler(mf, config)
+		gah = NewGCalAuthHandler(mf, config)
 	})
 
-	Describe("HandleFitbitAuthCode", func() {
-		It("should handle fitbit auth code", func() {
+	Describe("HandleGCalAuthCode", func() {
+		It("should handle gcal auth code", func() {
 			moc.EXPECT().Exchange(gomock.Any()).Return(token, nil)
-			ms.EXPECT().WriteFitbitToken(gomock.Any()).Return(nil)
+			ms.EXPECT().WriteGCalToken(gomock.Any()).Return(nil)
 
-			ts := httptest.NewServer(http.HandlerFunc(fah.HandleFitbitAuthCode))
+			ts := httptest.NewServer(http.HandlerFunc(gah.HandleGCalAuthCode))
 			res, err := http.Get(ts.URL + "?code=auth_code")
 			Expect(err).NotTo(HaveOccurred())
 			bodyBytes, err := ioutil.ReadAll(res.Body)

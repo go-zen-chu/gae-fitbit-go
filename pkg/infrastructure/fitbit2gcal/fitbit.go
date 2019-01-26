@@ -1,6 +1,7 @@
 package fitbit2gcal
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -19,21 +20,30 @@ const (
 )
 
 type fitbitClient struct {
-	store df2g.Store
+	store dfba.Store
+	config *df2g.FitbitConfig
 }
 
-func NewFitbitClient(store df2g.Store) df2g.FitbitClient {
+func NewFitbitClient(store dfba.Store, config *df2g.FitbitConfig) df2g.FitbitClient {
 	return &fitbitClient{
 		store: store,
+		config: config,
 	}
 }
 
 func (fc *fitbitClient) GetSleepData(dateStr string) (*df2g.Sleep, error) {
-	ft, err := fc.store.FetchFitbitTokens()
+	token, err := fc.store.FetchFitbitToken()
 	if err != nil {
 		return nil, err
 	}
-	s, err := requestSleepData(ft, dateStr)
+	cli := fc.config.OauthConfig.Client(context.Background(), token)
+	// make sure to save new token refreshed via oauth2 library
+	defer func () {
+		if err := fc.store.WriteFitbitToken(token); err != nil {
+			log.Errorf("%v\n", err)
+		}
+	}()
+	s, err := requestSleepData(cli, dateStr)
 	if err != nil {
 		return nil, err
 	}
@@ -41,19 +51,26 @@ func (fc *fitbitClient) GetSleepData(dateStr string) (*df2g.Sleep, error) {
 }
 
 func (fc *fitbitClient) GetActivityData(dateStr string) (*df2g.Activity, error) {
-	ft, err := fc.store.FetchFitbitTokens()
+	token, err := fc.store.FetchFitbitToken()
 	if err != nil {
 		return nil, err
 	}
-	a, err := requestActivityData(ft, dateStr)
+	cli := fc.config.OauthConfig.Client(context.Background(), token)
+	// make sure to save new token refreshed via oauth2 library
+	defer func () {
+		if err := fc.store.WriteFitbitToken(token); err != nil {
+			log.Errorf("%v\n", err)
+		}
+	}()
+	a, err := requestActivityData(cli, dateStr)
 	if err != nil {
 		return nil, err
 	}
 	return a, nil
 }
 
-func requestSleepData(ft *dfba.FitbitTokens, dateStr string) (*df2g.Sleep, error) {
-	resBytes, err := requestFitbitData(ft, "sleep", dateStr)
+func requestSleepData(cli *http.Client, dateStr string) (*df2g.Sleep, error) {
+	resBytes, err := requestFitbitData(cli, "sleep", dateStr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error requesting data")
 	}
@@ -65,8 +82,8 @@ func requestSleepData(ft *dfba.FitbitTokens, dateStr string) (*df2g.Sleep, error
 	return &s, nil
 }
 
-func requestActivityData(ft *dfba.FitbitTokens, dateStr string) (*df2g.Activity, error) {
-	resBytes, err := requestFitbitData(ft, "activities", dateStr)
+func requestActivityData(cli *http.Client, dateStr string) (*df2g.Activity, error) {
+	resBytes, err := requestFitbitData(cli, "activities", dateStr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error requesting data")
 	}
@@ -78,7 +95,8 @@ func requestActivityData(ft *dfba.FitbitTokens, dateStr string) (*df2g.Activity,
 	return &a, nil
 }
 
-func requestFitbitData(ft *dfba.FitbitTokens, dataType, dateStr string) ([]byte, error) {
+
+func requestFitbitData(cli *http.Client, dataType, dateStr string) ([]byte, error) {
 	u := &url.URL{}
 	u.Scheme = "https"
 	u.Host = "api.fitbit.com"
@@ -91,11 +109,11 @@ func requestFitbitData(ft *dfba.FitbitTokens, dataType, dateStr string) ([]byte,
 	if err != nil {
 		return nil, errors.Wrap(err, "Error creating request")
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ft.AccessToken))
+	// trasport will automatically add header
+	//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cli.)
 	log.Debugf("%v\n", req)
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := cli.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while requesting data to Fitbit")
 	}

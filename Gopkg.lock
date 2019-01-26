@@ -146,10 +146,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e007b54f54cbd4214aa6d97a67d57bc2539991adb4e22ea92c482bbece8de469"
+  digest = "1:fa78be64c278a518093b711d7b9b3126e711519665476beb51f464617519528b"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
+    "fitbit",
     "internal",
   ]
   pruneopts = "UT"
@@ -262,6 +263,7 @@
     "github.com/pkg/errors",
     "github.com/sirupsen/logrus",
     "golang.org/x/oauth2",
+    "golang.org/x/oauth2/fitbit",
     "google.golang.org/api/calendar/v3",
     "gopkg.in/alecthomas/kingpin.v2",
   ]

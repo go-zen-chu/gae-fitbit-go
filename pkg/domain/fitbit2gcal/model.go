@@ -2,6 +2,10 @@ package fitbit2gcal
 
 import "golang.org/x/oauth2"
 
+type FitbitConfig struct {
+	OauthConfig *oauth2.Config
+}
+
 type GCalConfig struct {
 	SleepCalendarID    string
 	ActivityCalendarID string

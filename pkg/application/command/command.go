@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/fitbit"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -28,7 +29,7 @@ type command struct{
 	fitbitauthFactory dfba.Factory
 	gcalauthFactory dga.Factory
 	fitbit2gcalFactory df2g.Factory
-	httpserver HttpServer
+	httpServer HttpServer
 }
 
 func NewCommand(
@@ -36,14 +37,14 @@ func NewCommand(
 	fitbitauthFactory dfba.Factory,
 	gcalauthFactory dga.Factory,
 	fitbit2gcalFactory df2g.Factory,
-	httpserver HttpServer,
+	httpServer HttpServer,
 	) Command {
 	return &command{
 		indexHandler: indexHandler,
 		fitbitauthFactory: fitbitauthFactory,
 		gcalauthFactory: gcalauthFactory,
 		fitbit2gcalFactory: fitbit2gcalFactory,
-		httpserver: httpserver,
+		httpServer: httpServer,
 	}
 }
 
@@ -70,23 +71,16 @@ func (c *command) Run() error {
 	}
 
 	// create handlers
-	fitbitAuthParams := &dfba.FitbitAuthParams{
-		ClientID:     *fbClientID,
-		Scope:        "sleep activity",
-		RedirectURI:  *fbAuthRedirectURI,
-		ResponseType: "code",
-		Expires:      "2592000", // 1 week
-	}
-
-	fitbitTokenParams := &dfba.FitbitTokenParams{
-		ClientID:     *fbClientID,
+	fbOauthConfig := &oauth2.Config{
+		ClientID: *fbClientID,
 		ClientSecret: *fbClientSecret,
-		GrantType:    "authorization_code",
-		RedirectURI:  *fbAuthRedirectURI,
+		Endpoint: fitbit.Endpoint,
+		RedirectURL: *fbAuthRedirectURI,
+		Scopes: []string { "sleep", "activity" },
 	}
-	fbaHandler := c.fitbitauthFactory.FitbitAuthHandler(fitbitAuthParams, fitbitTokenParams)
+	fbaHandler := c.fitbitauthFactory.FitbitAuthHandler(fbOauthConfig)
 
-	oauthConfig := &oauth2.Config{
+	gcalOauthConfig := &oauth2.Config{
 		ClientID: *gcalClientID,
 		ClientSecret: *gcalClientSecret,
 		Endpoint: oauth2.Endpoint{
@@ -96,26 +90,29 @@ func (c *command) Run() error {
 		RedirectURL: *gcalAuthRedirectURI,
 		Scopes: []string { calendar.CalendarEventsScope },
 	}
-	gaHandler := c.gcalauthFactory.GCalAuthHandler(oauthConfig)
+	gaHandler := c.gcalauthFactory.GCalAuthHandler(gcalOauthConfig)
 
+	fitbitConfig := &df2g.FitbitConfig{
+		OauthConfig: fbOauthConfig,
+	}
 	gcalConfig := &df2g.GCalConfig{
 		SleepCalendarID:    *gcalSleepCalendarID,
 		ActivityCalendarID: *gcalActivityCalendarID,
-		OauthConfig: oauthConfig,
+		OauthConfig: gcalOauthConfig,
 	}
-
-	f2gService := c.fitbit2gcalFactory.Service(gcalConfig)
+	f2gService := c.fitbit2gcalFactory.Service(fitbitConfig, gcalConfig)
 
 	// Register http handler to routes
 	http.HandleFunc("/index.html", c.indexHandler.HandleIndex)
+
 	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fbaHandler.Redirect2Fitbit)
 	http.HandleFunc(fmt.Sprintf("/%s/fitbitstoretoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbitupdatetoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
+
 	http.HandleFunc(fmt.Sprintf("/%s/gcalauth", apiVersion), gaHandler.Redirect2GCal)
 	http.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), gaHandler.HandleGCalAuthCode)
-	http.HandleFunc(fmt.Sprintf("/%s/gcalupdatetoken", apiVersion), fbaHandler.HandleGCalAuthCode)
+
+	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
 
 	log.Infof("Running gae-fitbit-go on : %s", *port)
-	return c.httpserver.Run(*port)
+	return c.httpServer.Run(*port)
 }

@@ -16,20 +16,20 @@ func NewFileStore() dga.Store {
 	return &fileStore{}
 }
 
-func (fs *fileStore) WriteGCalTokens(token *oauth2.Token) error {
+func (fs *fileStore) WriteGCalToken(token *oauth2.Token) error {
 	tokenBytes, err := json.Marshal(token)
 	if err != nil {
 		return errors.Wrap(err, "Error while marshaling")
 	}
-	err = ioutil.WriteFile("gcal-token.json", tokenBytes, 0644)
+	err = ioutil.WriteFile("gcal_oauth_token.json", tokenBytes, 0644)
 	if err != nil {
 		return errors.Wrap(err, "Error while writing token to file")
 	}
 	return nil
 }
 
-func (fs *fileStore) FetchGCalTokens() (*oauth2.Token, error) {
-	tokenBytes, err := ioutil.ReadFile("./gcal-token.json")
+func (fs *fileStore) FetchGCalToken() (*oauth2.Token, error) {
+	tokenBytes, err := ioutil.ReadFile("gcal_oauth_token.json")
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while getting token from file")
 	}

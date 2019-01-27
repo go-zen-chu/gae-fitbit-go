@@ -3,11 +3,9 @@ package command
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/fitbit"
-	"net/http"
-
-	log "github.com/sirupsen/logrus"
 
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
 	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
@@ -63,7 +61,7 @@ var (
 	gcalClientSecret       = kingpin.Flag("gcal-client-secret", "Google Calendar Client Secret").Envar("GAE_FITBIT_GO_GCAL_CLIENT_SECRET").String()
 	gcalAuthRedirectURI    = kingpin.Flag("gcal-auth-redirect-uri", "GCal auth redirect url").Default("http://localhost:8080/v1/gcalstoretoken").Envar("GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI").String()
 	// application options
-	useCloudStorage        = kingpin.Flag("use-cloud-storage", "Use Cloud Storage or not. If you deploy as GAE, needs to be true").Envar("USE_CLOUD_STORAGE").Default("false").Bool()
+	useCloudStorage        = kingpin.Flag("use-cloud-storage", "Use Cloud Storage or not. If you deploy as GAE, needs to be true").Envar("USE_CLOUD_STORAGE").Bool()
 	cloudStorageBucketName = kingpin.Flag("cloud-storage-bucket-name", "Google Cloud bucket name to use").Envar("CLOUD_STORAGE_BUCKET_NAME").String()
 )
 
@@ -129,15 +127,15 @@ func (c *command) Run() error {
 	f2gService := c.fitbit2gcalFactory.Service(fitbitConfig, gcalConfig, fbaStore, gaStore)
 
 	// Register http handler to routes
-	http.HandleFunc("/index.html", c.indexHandler.HandleIndex)
+	c.httpServer.HandleFunc("/index.html", c.indexHandler.HandleIndex)
 
-	http.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fbaHandler.Redirect2Fitbit)
-	http.HandleFunc(fmt.Sprintf("/%s/fitbitstoretoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fbaHandler.Redirect2Fitbit)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbitstoretoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
 
-	http.HandleFunc(fmt.Sprintf("/%s/gcalauth", apiVersion), gaHandler.Redirect2GCal)
-	http.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), gaHandler.HandleGCalAuthCode)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalauth", apiVersion), gaHandler.Redirect2GCal)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), gaHandler.HandleGCalAuthCode)
 
-	http.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
 
 	log.Infof("Running gae-fitbit-go on : %s", *port)
 	return c.httpServer.Run(*port)

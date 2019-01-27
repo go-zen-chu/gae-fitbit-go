@@ -19,8 +19,10 @@ var _ = Describe("command", func() {
 		mih   *index.MockIndexHandler
 		mfaf  *dfba.MockFactory
 		mfah  *dfba.MockFitbitAuthHandler
+		mfast *dfba.MockStore
 		mgaf  *dga.MockFactory
 		mgah  *dga.MockGCalAuthHandler
+		mgast *dga.MockStore
 		mf2gf *df2g.MockFactory
 		mf2gs *df2g.MockService
 		mhs   *command.MockHttpServer
@@ -31,8 +33,10 @@ var _ = Describe("command", func() {
 		mih = index.NewMockIndexHandler(c)
 		mfaf = dfba.NewMockFactory(c)
 		mfah = dfba.NewMockFitbitAuthHandler(c)
+		mfast = dfba.NewMockStore(c)
 		mgaf = dga.NewMockFactory(c)
 		mgah = dga.NewMockGCalAuthHandler(c)
+		mgast = dga.NewMockStore(c)
 		mf2gf = df2g.NewMockFactory(c)
 		mf2gs = df2g.NewMockService(c)
 		mhs = command.NewMockHttpServer(c)
@@ -50,33 +54,70 @@ var _ = Describe("command", func() {
 	})
 
 	Describe("Run", func() {
-		var cmd command.Command
+		Describe("With FileStore args", func() {
+			var cmd command.Command
+			BeforeEach(func() {
+				mfaf.EXPECT().FileStore().Return(mfast, nil)
+				mfaf.EXPECT().FitbitAuthHandler(gomock.Any(), gomock.Any()).Return(mfah)
+				mgaf.EXPECT().FileStore().Return(mgast, nil)
+				mgaf.EXPECT().GCalAuthHandler(gomock.Any(), gomock.Any()).Return(mgah)
+				mf2gf.EXPECT().Service(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mf2gs)
 
-		BeforeEach(func() {
-			mfaf.EXPECT().FitbitAuthHandler(gomock.Any()).Return(mfah)
-			mgaf.EXPECT().GCalAuthHandler(gomock.Any()).Return(mgah)
-			mf2gf.EXPECT().Service(gomock.Any(), gomock.Any()).Return(mf2gs)
+				mhs.EXPECT().HandleFunc(gomock.Any(), gomock.Any()).AnyTimes().Return()
+				mhs.EXPECT().Run("9091").Return(nil)
 
-			mhs.EXPECT().Run("9091").Return(nil)
+				cmd = command.NewCommand(mih, mfaf, mgaf, mf2gf, mhs)
+			})
 
-			cmd = command.NewCommand(mih, mfaf, mgaf, mf2gf, mhs)
+			It("should run", func() {
+				args := os.Args
+				os.Args = []string{"gae-fitbit-go",
+					"--port", "9091",
+					"--fb-client-id", "fb-client-id",
+					"--fb-client-secret", "fb-client-secret",
+					"--gcal-sleep-cal-id", "gcal-sleep-cal-id",
+					"--gcal-activity-cal-id", "gcal-activity-cal-id",
+					"--gcal-client-id", "gcal-client-id",
+					"--gcal-client-secret", "gcal-client-secret",
+				}
+				err := cmd.Run()
+				Expect(err).To(BeNil())
+				os.Args = args
+			})
 		})
 
-		It("should run", func() {
-			args := os.Args
-			os.Args = []string{"gae-fitbit-go",
-				"--port", "9091",
-				"--fb-client-id", "fb-client-id",
-				"--fb-client-secret", "fb-client-secret",
-				"--gcal-sleep-cal-id", "gcal-sleep-cal-id",
-				"--gcal-activity-cal-id", "gcal-activity-cal-id",
-				"--gcal-client-id", "gcal-client-id",
-				"--gcal-client-secret", "gcal-client-secret",
-			}
-			err := cmd.Run()
-			Expect(err).To(BeNil())
-			os.Args = args
+		Describe("With CloudStorageStore args", func() {
+			var cmd command.Command
+			BeforeEach(func() {
+				mfaf.EXPECT().CloudStorageStore(gomock.Any()).Return(mfast, nil)
+				mfaf.EXPECT().FitbitAuthHandler(gomock.Any(), gomock.Any()).Return(mfah)
+				mgaf.EXPECT().CloudStorageStore(gomock.Any()).Return(mgast, nil)
+				mgaf.EXPECT().GCalAuthHandler(gomock.Any(), gomock.Any()).Return(mgah)
+				mf2gf.EXPECT().Service(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mf2gs)
+
+				mhs.EXPECT().HandleFunc(gomock.Any(), gomock.Any()).AnyTimes().Return()
+				mhs.EXPECT().Run("9091").Return(nil)
+
+				cmd = command.NewCommand(mih, mfaf, mgaf, mf2gf, mhs)
+			})
+
+			It("should run", func() {
+				args := os.Args
+				os.Args = []string{"gae-fitbit-go",
+					"--port", "9091",
+					"--fb-client-id", "fb-client-id",
+					"--fb-client-secret", "fb-client-secret",
+					"--gcal-sleep-cal-id", "gcal-sleep-cal-id",
+					"--gcal-activity-cal-id", "gcal-activity-cal-id",
+					"--gcal-client-id", "gcal-client-id",
+					"--gcal-client-secret", "gcal-client-secret",
+					"--use-cloud-storage",
+					"--cloud-storage-bucket-name", "bucket-name",
+				}
+				err := cmd.Run()
+				Expect(err).To(BeNil())
+				os.Args = args
+			})
 		})
 	})
-
 })

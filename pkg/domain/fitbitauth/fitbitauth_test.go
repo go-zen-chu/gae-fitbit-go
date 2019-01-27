@@ -45,7 +45,7 @@ var _ = Describe("fitbitauth", func() {
 		mf.EXPECT().FileStore().Return(ms, nil)
 		mf.EXPECT().OAuthClient(config).Return(moc)
 
-		fah = NewFitbitAuthHandler(mf, config)
+		fah = NewFitbitAuthHandler(mf, ms, config)
 	})
 
 	Describe("HandleFitbitAuthCode", func() {

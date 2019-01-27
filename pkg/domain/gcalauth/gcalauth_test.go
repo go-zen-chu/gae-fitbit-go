@@ -46,7 +46,7 @@ var _ = Describe("gcalauth", func() {
 		mf.EXPECT().FileStore().Return(ms, nil)
 		mf.EXPECT().OAuthClient(config).Return(moc)
 
-		gah = NewGCalAuthHandler(mf, config)
+		gah = NewGCalAuthHandler(mf, ms, config)
 	})
 
 	Describe("HandleGCalAuthCode", func() {

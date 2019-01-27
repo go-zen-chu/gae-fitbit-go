@@ -1,16 +1,16 @@
 package fitbitauth
 
 import (
+	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
-	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
 )
 
 type oauthClient struct {
 	config *oauth2.Config
 }
 
-func NewOAuthClient (config *oauth2.Config) dfba.OAuthClient {
+func NewOAuthClient(config *oauth2.Config) dfba.OAuthClient {
 	return &oauthClient{
 		config: config,
 	}

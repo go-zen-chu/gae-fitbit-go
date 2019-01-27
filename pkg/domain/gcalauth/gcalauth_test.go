@@ -15,13 +15,13 @@ import (
 
 var _ = Describe("gcalauth", func() {
 	var (
-		c     *gomock.Controller
-		mf *MockFactory
-		ms *MockStore
-		moc *MockOAuthClient
-		gah   GCalAuthHandler
+		c      *gomock.Controller
+		mf     *MockFactory
+		ms     *MockStore
+		moc    *MockOAuthClient
+		gah    GCalAuthHandler
 		config *oauth2.Config
-		token    *oauth2.Token
+		token  *oauth2.Token
 	)
 
 	BeforeEach(func() {
@@ -31,17 +31,17 @@ var _ = Describe("gcalauth", func() {
 		moc = NewMockOAuthClient(c)
 
 		config = &oauth2.Config{
-			ClientID: "gcal-client-id",
+			ClientID:     "gcal-client-id",
 			ClientSecret: "gcal-client-secret",
-			Endpoint: fitbit.Endpoint,
-			RedirectURL: "http://127.0.0.1:8080/v1/gcalstoretoken",
-			Scopes: []string { calendar.CalendarEventsScope },
+			Endpoint:     fitbit.Endpoint,
+			RedirectURL:  "http://127.0.0.1:8080/v1/gcalstoretoken",
+			Scopes:       []string{calendar.CalendarEventsScope},
 		}
 		token = &oauth2.Token{
 			AccessToken:  "access-token",
 			RefreshToken: "refresh-token",
 			TokenType:    "refresh",
-			Expiry: time.Now().Add(8 * time.Hour),
+			Expiry:       time.Now().Add(8 * time.Hour),
 		}
 		mf.EXPECT().FileStore().Return(ms, nil)
 		mf.EXPECT().OAuthClient(config).Return(moc)

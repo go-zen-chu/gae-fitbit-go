@@ -28,6 +28,8 @@
 # custom
 mock_*
 .envrc
-*.json
+fitbit*.json
+cred*.json
+gcal*.json
 LICENSE
 README.md

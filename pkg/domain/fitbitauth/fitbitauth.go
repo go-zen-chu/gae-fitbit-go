@@ -16,15 +16,17 @@ type FitbitAuthHandler interface {
 }
 
 type fitbitAuthHandler struct {
-	factory           Factory
+	factory     Factory
+	store Store
 	oauthConfig *oauth2.Config
-	oauthClient            OAuthClient
+	oauthClient OAuthClient
 }
 
-func NewFitbitAuthHandler(fbaf Factory, oauthConfig *oauth2.Config) FitbitAuthHandler {
+func NewFitbitAuthHandler(fbaf Factory, store Store, oauthConfig *oauth2.Config) FitbitAuthHandler {
 	oauthClient := fbaf.OAuthClient(oauthConfig)
 	return &fitbitAuthHandler{
-		factory:           fbaf,
+		factory:     fbaf,
+		store: store,
 		oauthConfig: oauthConfig,
 		oauthClient: oauthClient,
 	}
@@ -35,7 +37,6 @@ func (fah *fitbitAuthHandler) Redirect2Fitbit(w http.ResponseWriter, r *http.Req
 	authURL := fah.oauthClient.GetAuthCodeURL()
 	http.Redirect(w, r, authURL, http.StatusSeeOther)
 }
-
 
 // HandleFitbitAuthCode : Will recieve auth code from Fitbit, store it
 func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request) {
@@ -51,14 +52,6 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 	code := keys[0]
 	log.Debugf("auth code :%s", code)
 
-	fst, err := fah.factory.FileStore()
-	if err != nil {
-		err = errors.Wrap(err, "Error while getting store")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	token, err := fah.oauthClient.Exchange(code)
 	if err != nil {
 		err = errors.Wrap(err, "Error while getting token")
@@ -67,7 +60,7 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 		return
 	}
 
-	err = fst.WriteFitbitToken(token)
+	err = fah.store.WriteFitbitToken(token)
 	if err != nil {
 		err = errors.Wrap(err, "Error while storing token")
 		log.Errorln(err)

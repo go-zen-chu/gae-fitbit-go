@@ -8,6 +8,7 @@ import (
 // Factory : Creates objects in this package
 type Factory interface {
 	FileStore() (Store, error)
-	FitbitAuthHandler(config *oauth2.Config) FitbitAuthHandler
+	FitbitAuthHandler(store Store, config *oauth2.Config) FitbitAuthHandler
 	OAuthClient(config *oauth2.Config) OAuthClient
+	CloudStorageStore(bucketName string) (Store, error)
 }

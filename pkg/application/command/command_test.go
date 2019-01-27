@@ -11,24 +11,22 @@ import (
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
 	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
 	dga "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
-
-
 )
 
 var _ = Describe("command", func() {
 	var (
-		c *gomock.Controller
-		mih *index.MockIndexHandler
-		mfaf *dfba.MockFactory
-		mfah *dfba.MockFitbitAuthHandler
-		mgaf *dga.MockFactory
-		mgah *dga.MockGCalAuthHandler
+		c     *gomock.Controller
+		mih   *index.MockIndexHandler
+		mfaf  *dfba.MockFactory
+		mfah  *dfba.MockFitbitAuthHandler
+		mgaf  *dga.MockFactory
+		mgah  *dga.MockGCalAuthHandler
 		mf2gf *df2g.MockFactory
 		mf2gs *df2g.MockService
-		mhs *command.MockHttpServer
+		mhs   *command.MockHttpServer
 	)
 
-	BeforeEach(func(){
+	BeforeEach(func() {
 		c = gomock.NewController(GinkgoT())
 		mih = index.NewMockIndexHandler(c)
 		mfaf = dfba.NewMockFactory(c)
@@ -44,7 +42,7 @@ var _ = Describe("command", func() {
 		c.Finish()
 	})
 
-	Describe("NewCommand", func(){
+	Describe("NewCommand", func() {
 		It("should make new command", func() {
 			cmd := command.NewCommand(mih, mfaf, mgaf, mf2gf, mhs)
 			Expect(cmd).ShouldNot(BeNil())

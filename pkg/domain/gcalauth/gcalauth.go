@@ -17,15 +17,17 @@ type GCalAuthHandler interface {
 }
 
 type gcalAuthHandler struct {
-	factory Factory
+	factory     Factory
+	store Store
 	oauthConfig *oauth2.Config
-	oauthClient  OAuthClient
+	oauthClient OAuthClient
 }
 
-func NewGCalAuthHandler(gaf Factory, oauthConfig *oauth2.Config) GCalAuthHandler {
+func NewGCalAuthHandler(gaf Factory, store Store, oauthConfig *oauth2.Config) GCalAuthHandler {
 	oauthClient := gaf.OAuthClient(oauthConfig)
 	return &gcalAuthHandler{
-		factory: gaf,
+		factory:     gaf,
+		store: store,
 		oauthConfig: oauthConfig,
 		oauthClient: oauthClient,
 	}
@@ -51,14 +53,6 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 	code := keys[0]
 	log.Debugf("auth code :%s", code)
 
-	fst, err := gah.factory.FileStore()
-	if err != nil {
-		err = errors.Wrap(err, "Error while getting store")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	token, err := gah.oauthClient.Exchange(code)
 	if err != nil {
 		err = errors.Wrap(err, "Error while getting token")
@@ -67,7 +61,7 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	err = fst.WriteGCalToken(token)
+	err = gah.store.WriteGCalToken(token)
 	if err != nil {
 		err = errors.Wrap(err, "Error while storing token")
 		log.Errorln(err)

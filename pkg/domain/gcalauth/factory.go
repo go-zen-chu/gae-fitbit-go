@@ -6,6 +6,7 @@ import "golang.org/x/oauth2"
 // Factory : Creates objects in this package
 type Factory interface {
 	FileStore() (Store, error)
-	GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandler
+	CloudStorageStore(bucketName string) (Store, error)
+	GCalAuthHandler(store Store, oauthConfig *oauth2.Config) GCalAuthHandler
 	OAuthClient(config *oauth2.Config) OAuthClient
 }

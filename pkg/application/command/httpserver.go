@@ -10,7 +10,7 @@ type HttpServer interface {
 	Run(port string) error
 }
 
-type httpServer struct {}
+type httpServer struct{}
 
 func NewHttpServer() HttpServer {
 	return &httpServer{}

@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/fitbit"
 	"net/http"
@@ -24,12 +25,12 @@ type Command interface {
 	Run() error
 }
 
-type command struct{
-	indexHandler index.IndexHandler
-	fitbitauthFactory dfba.Factory
-	gcalauthFactory dga.Factory
+type command struct {
+	indexHandler       index.IndexHandler
+	fitbitauthFactory  dfba.Factory
+	gcalauthFactory    dga.Factory
 	fitbit2gcalFactory df2g.Factory
-	httpServer HttpServer
+	httpServer         HttpServer
 }
 
 func NewCommand(
@@ -38,13 +39,13 @@ func NewCommand(
 	gcalauthFactory dga.Factory,
 	fitbit2gcalFactory df2g.Factory,
 	httpServer HttpServer,
-	) Command {
+) Command {
 	return &command{
-		indexHandler: indexHandler,
-		fitbitauthFactory: fitbitauthFactory,
-		gcalauthFactory: gcalauthFactory,
+		indexHandler:       indexHandler,
+		fitbitauthFactory:  fitbitauthFactory,
+		gcalauthFactory:    gcalauthFactory,
 		fitbit2gcalFactory: fitbit2gcalFactory,
-		httpServer: httpServer,
+		httpServer:         httpServer,
 	}
 }
 
@@ -58,9 +59,12 @@ var (
 	// gcal options
 	gcalSleepCalendarID    = kingpin.Flag("gcal-sleep-cal-id", "Google sleep calendar ID").Envar("GAE_FITBIT_GO_FITBIT_GCAL_SLEEP_CAL_ID").String()
 	gcalActivityCalendarID = kingpin.Flag("gcal-activity-cal-id", "Google activity calendar ID").Envar("GAE_FITBIT_GO_FITBIT_GCAL_ACTIVITY_CAL_ID").String()
-	gcalClientID        = kingpin.Flag("gcal-client-id", "Google Calendar Client ID").Envar("GAE_FITBIT_GO_GCAL_CLIENT_ID").String()
-	gcalClientSecret        = kingpin.Flag("gcal-client-secret", "Google Calendar Client Secret").Envar("GAE_FITBIT_GO_GCAL_CLIENT_SECRET").String()
-	gcalAuthRedirectURI = kingpin.Flag("gcal-auth-redirect-uri", "GCal auth redirect url").Default("http://localhost:8080/v1/gcalstoretoken").Envar("GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI").String()
+	gcalClientID           = kingpin.Flag("gcal-client-id", "Google Calendar Client ID").Envar("GAE_FITBIT_GO_GCAL_CLIENT_ID").String()
+	gcalClientSecret       = kingpin.Flag("gcal-client-secret", "Google Calendar Client Secret").Envar("GAE_FITBIT_GO_GCAL_CLIENT_SECRET").String()
+	gcalAuthRedirectURI    = kingpin.Flag("gcal-auth-redirect-uri", "GCal auth redirect url").Default("http://localhost:8080/v1/gcalstoretoken").Envar("GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI").String()
+	// application options
+	useCloudStorage = kingpin.Flag("use-cloud-storage", "Use Cloud Storage or not. If you deploy as GAE, needs to be true").Envar("USE_CLOUD_STORAGE").Default("false").Bool()
+	cloudStorageBucketName       = kingpin.Flag("cloud-storage-bucket-name", "Google Cloud bucket name to use").Envar("CLOUD_STORAGE_BUCKET_NAME").String()
 )
 
 // Run() : runs http api with specified config
@@ -69,28 +73,50 @@ func (c *command) Run() error {
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
 	}
+	var err error
+	var fbaStore dfba.Store
+	var gaStore dga.Store
+	if *useCloudStorage {
+		fbaStore, err = c.fitbitauthFactory.CloudStorageStore(*cloudStorageBucketName)
+		if err != nil {
+			return errors.Wrap(err, "Error while making cloud storage store")
+		}
+		gaStore, err = c.gcalauthFactory.CloudStorageStore(*cloudStorageBucketName)
+		if err != nil {
+			return errors.Wrap(err, "Error while making cloud storage store")
+		}
+	} else {
+		fbaStore, err = c.fitbitauthFactory.FileStore()
+		if err != nil {
+			return errors.Wrap(err, "Error while making file store")
+		}
+		gaStore, err = c.gcalauthFactory.FileStore()
+		if err != nil {
+			return errors.Wrap(err, "Error while making file store")
+		}
+	}
 
 	// create handlers
 	fbOauthConfig := &oauth2.Config{
-		ClientID: *fbClientID,
+		ClientID:     *fbClientID,
 		ClientSecret: *fbClientSecret,
-		Endpoint: fitbit.Endpoint,
-		RedirectURL: *fbAuthRedirectURI,
-		Scopes: []string { "sleep", "activity" },
+		Endpoint:     fitbit.Endpoint,
+		RedirectURL:  *fbAuthRedirectURI,
+		Scopes:       []string{"sleep", "activity"},
 	}
-	fbaHandler := c.fitbitauthFactory.FitbitAuthHandler(fbOauthConfig)
+	fbaHandler := c.fitbitauthFactory.FitbitAuthHandler(fbaStore, fbOauthConfig)
 
 	gcalOauthConfig := &oauth2.Config{
-		ClientID: *gcalClientID,
+		ClientID:     *gcalClientID,
 		ClientSecret: *gcalClientSecret,
 		Endpoint: oauth2.Endpoint{
-			AuthURL: "https://accounts.google.com/o/oauth2/auth",
+			AuthURL:  "https://accounts.google.com/o/oauth2/auth",
 			TokenURL: "https://www.googleapis.com/oauth2/v3/token",
 		},
 		RedirectURL: *gcalAuthRedirectURI,
-		Scopes: []string { calendar.CalendarEventsScope },
+		Scopes:      []string{calendar.CalendarEventsScope},
 	}
-	gaHandler := c.gcalauthFactory.GCalAuthHandler(gcalOauthConfig)
+	gaHandler := c.gcalauthFactory.GCalAuthHandler(gaStore, gcalOauthConfig)
 
 	fitbitConfig := &df2g.FitbitConfig{
 		OauthConfig: fbOauthConfig,
@@ -98,9 +124,9 @@ func (c *command) Run() error {
 	gcalConfig := &df2g.GCalConfig{
 		SleepCalendarID:    *gcalSleepCalendarID,
 		ActivityCalendarID: *gcalActivityCalendarID,
-		OauthConfig: gcalOauthConfig,
+		OauthConfig:        gcalOauthConfig,
 	}
-	f2gService := c.fitbit2gcalFactory.Service(fitbitConfig, gcalConfig)
+	f2gService := c.fitbit2gcalFactory.Service(fitbitConfig, gcalConfig, fbaStore, gaStore)
 
 	// Register http handler to routes
 	http.HandleFunc("/index.html", c.indexHandler.HandleIndex)

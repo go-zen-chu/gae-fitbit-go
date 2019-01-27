@@ -128,7 +128,7 @@ func duration2HourMin(duration time.Duration) (time.Duration, time.Duration) {
 	durationInMinutes := duration.Round(time.Minute)
 	durationHour := durationInMinutes / time.Hour
 	var remainDuration time.Duration
-	remainDuration = duration - durationHour * time.Hour
+	remainDuration = duration - durationHour*time.Hour
 	durationMin := remainDuration / time.Minute
 	return durationHour, durationMin
 }
@@ -142,8 +142,8 @@ func convertSleep2Events(sleep *Sleep) ([]calendar.Event, error) {
 		return nil, err
 	}
 
-	for _, s := range sleep.Sleep{
-		duration :=  time.Duration(s.Duration) * time.Millisecond
+	for _, s := range sleep.Sleep {
+		duration := time.Duration(s.Duration) * time.Millisecond
 
 		startTime, err := time.ParseInLocation("2006-01-02T15:04:05.999", s.StartTime, lc)
 		if err != nil {
@@ -158,12 +158,12 @@ func convertSleep2Events(sleep *Sleep) ([]calendar.Event, error) {
 		awakeHour, awakeMin := duration2HourMin(durationAwake)
 
 		summary := fmt.Sprintf("Sleep %02d:%02d", durationHour, durationMin)
-		desc := fmt.Sprintf("DateOfSleep : %s\n" +
-			"Duration : %02d:%02d\n" +
-			"Efficiency : %d\n" +
-			"IsMainSleep : %t\n" +
-			"MinutesAsleep : %02d:%02d\n" +
-			"MinutesAwake : %02d:%02d\n" +
+		desc := fmt.Sprintf("DateOfSleep : %s\n"+
+			"Duration : %02d:%02d\n"+
+			"Efficiency : %d\n"+
+			"IsMainSleep : %t\n"+
+			"MinutesAsleep : %02d:%02d\n"+
+			"MinutesAwake : %02d:%02d\n"+
 			"LogID : %d\n",
 			s.DateOfSleep,
 			durationHour, durationMin,
@@ -172,7 +172,7 @@ func convertSleep2Events(sleep *Sleep) ([]calendar.Event, error) {
 			asleepHour, asleepMin,
 			awakeHour, awakeMin,
 			s.LogID)
-		ev :=  &calendar.Event {
+		ev := &calendar.Event{
 			Summary: summary,
 			Start: &calendar.EventDateTime{
 				DateTime: startTime.Format("2006-01-02T15:04:05"),
@@ -199,7 +199,7 @@ func convertActivity2Events(activity *Activity) ([]calendar.Event, error) {
 	}
 
 	for _, a := range activity.Activities {
-		duration :=  time.Duration(a.Duration) * time.Millisecond
+		duration := time.Duration(a.Duration) * time.Millisecond
 
 		startTime, err := time.ParseInLocation("2006-01-02T15:04:05.999-07:00", a.StartTime, lc)
 		if err != nil {
@@ -210,15 +210,15 @@ func convertActivity2Events(activity *Activity) ([]calendar.Event, error) {
 		durationHour, durationMin := duration2HourMin(duration)
 
 		summary := fmt.Sprintf("%s %02d:%02d", a.ActivityName, durationHour, durationMin)
-		desc := fmt.Sprintf("Calories : %d\n" +
-			"Duration : %02d:%02d\n" +
-			"Steps : %d\n" +
+		desc := fmt.Sprintf("Calories : %d\n"+
+			"Duration : %02d:%02d\n"+
+			"Steps : %d\n"+
 			"LogID : %d\n",
 			a.Calories,
 			durationHour, durationMin,
 			a.Steps,
 			a.LogID)
-		ev :=  &calendar.Event {
+		ev := &calendar.Event{
 			Summary: summary,
 			Start: &calendar.EventDateTime{
 				DateTime: startTime.Format("2006-01-02T15:04:05"),
@@ -234,4 +234,3 @@ func convertActivity2Events(activity *Activity) ([]calendar.Event, error) {
 	}
 	return events, nil
 }
-

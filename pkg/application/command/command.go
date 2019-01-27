@@ -63,8 +63,8 @@ var (
 	gcalClientSecret       = kingpin.Flag("gcal-client-secret", "Google Calendar Client Secret").Envar("GAE_FITBIT_GO_GCAL_CLIENT_SECRET").String()
 	gcalAuthRedirectURI    = kingpin.Flag("gcal-auth-redirect-uri", "GCal auth redirect url").Default("http://localhost:8080/v1/gcalstoretoken").Envar("GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI").String()
 	// application options
-	useCloudStorage = kingpin.Flag("use-cloud-storage", "Use Cloud Storage or not. If you deploy as GAE, needs to be true").Envar("USE_CLOUD_STORAGE").Default("false").Bool()
-	cloudStorageBucketName       = kingpin.Flag("cloud-storage-bucket-name", "Google Cloud bucket name to use").Envar("CLOUD_STORAGE_BUCKET_NAME").String()
+	useCloudStorage        = kingpin.Flag("use-cloud-storage", "Use Cloud Storage or not. If you deploy as GAE, needs to be true").Envar("USE_CLOUD_STORAGE").Default("false").Bool()
+	cloudStorageBucketName = kingpin.Flag("cloud-storage-bucket-name", "Google Cloud bucket name to use").Envar("CLOUD_STORAGE_BUCKET_NAME").String()
 )
 
 // Run() : runs http api with specified config

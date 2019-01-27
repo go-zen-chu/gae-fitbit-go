@@ -17,7 +17,7 @@ type FitbitAuthHandler interface {
 
 type fitbitAuthHandler struct {
 	factory     Factory
-	store Store
+	store       Store
 	oauthConfig *oauth2.Config
 	oauthClient OAuthClient
 }
@@ -26,7 +26,7 @@ func NewFitbitAuthHandler(fbaf Factory, store Store, oauthConfig *oauth2.Config)
 	oauthClient := fbaf.OAuthClient(oauthConfig)
 	return &fitbitAuthHandler{
 		factory:     fbaf,
-		store: store,
+		store:       store,
 		oauthConfig: oauthConfig,
 		oauthClient: oauthClient,
 	}

@@ -18,7 +18,7 @@ type GCalAuthHandler interface {
 
 type gcalAuthHandler struct {
 	factory     Factory
-	store Store
+	store       Store
 	oauthConfig *oauth2.Config
 	oauthClient OAuthClient
 }
@@ -27,7 +27,7 @@ func NewGCalAuthHandler(gaf Factory, store Store, oauthConfig *oauth2.Config) GC
 	oauthClient := gaf.OAuthClient(oauthConfig)
 	return &gcalAuthHandler{
 		factory:     gaf,
-		store: store,
+		store:       store,
 		oauthConfig: oauthConfig,
 		oauthClient: oauthClient,
 	}

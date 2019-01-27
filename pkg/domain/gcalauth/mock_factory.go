@@ -46,16 +46,29 @@ func (mr *MockFactoryMockRecorder) FileStore() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FileStore", reflect.TypeOf((*MockFactory)(nil).FileStore))
 }
 
+// CloudStorageStore mocks base method
+func (m *MockFactory) CloudStorageStore(bucketName string) (Store, error) {
+	ret := m.ctrl.Call(m, "CloudStorageStore", bucketName)
+	ret0, _ := ret[0].(Store)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CloudStorageStore indicates an expected call of CloudStorageStore
+func (mr *MockFactoryMockRecorder) CloudStorageStore(bucketName interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloudStorageStore", reflect.TypeOf((*MockFactory)(nil).CloudStorageStore), bucketName)
+}
+
 // GCalAuthHandler mocks base method
-func (m *MockFactory) GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandler {
-	ret := m.ctrl.Call(m, "GCalAuthHandler", oauthConfig)
+func (m *MockFactory) GCalAuthHandler(store Store, oauthConfig *oauth2.Config) GCalAuthHandler {
+	ret := m.ctrl.Call(m, "GCalAuthHandler", store, oauthConfig)
 	ret0, _ := ret[0].(GCalAuthHandler)
 	return ret0
 }
 
 // GCalAuthHandler indicates an expected call of GCalAuthHandler
-func (mr *MockFactoryMockRecorder) GCalAuthHandler(oauthConfig interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GCalAuthHandler", reflect.TypeOf((*MockFactory)(nil).GCalAuthHandler), oauthConfig)
+func (mr *MockFactoryMockRecorder) GCalAuthHandler(store, oauthConfig interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GCalAuthHandler", reflect.TypeOf((*MockFactory)(nil).GCalAuthHandler), store, oauthConfig)
 }
 
 // OAuthClient mocks base method

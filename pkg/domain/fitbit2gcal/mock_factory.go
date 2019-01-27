@@ -35,39 +35,15 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 }
 
 // Service mocks base method
-func (m *MockFactory) Service(fitbitConfig *FitbitConfig, gcalConfig *GCalConfig) Service {
-	ret := m.ctrl.Call(m, "Service", fitbitConfig, gcalConfig)
+func (m *MockFactory) Service(fitbitConfig *FitbitConfig, gcalConfig *GCalConfig, fbst fitbitauth.Store, gst gcalauth.Store) Service {
+	ret := m.ctrl.Call(m, "Service", fitbitConfig, gcalConfig, fbst, gst)
 	ret0, _ := ret[0].(Service)
 	return ret0
 }
 
 // Service indicates an expected call of Service
-func (mr *MockFactoryMockRecorder) Service(fitbitConfig, gcalConfig interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockFactory)(nil).Service), fitbitConfig, gcalConfig)
-}
-
-// FitbitFileStore mocks base method
-func (m *MockFactory) FitbitFileStore() fitbitauth.Store {
-	ret := m.ctrl.Call(m, "FitbitFileStore")
-	ret0, _ := ret[0].(fitbitauth.Store)
-	return ret0
-}
-
-// FitbitFileStore indicates an expected call of FitbitFileStore
-func (mr *MockFactoryMockRecorder) FitbitFileStore() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FitbitFileStore", reflect.TypeOf((*MockFactory)(nil).FitbitFileStore))
-}
-
-// GCalFileStore mocks base method
-func (m *MockFactory) GCalFileStore() gcalauth.Store {
-	ret := m.ctrl.Call(m, "GCalFileStore")
-	ret0, _ := ret[0].(gcalauth.Store)
-	return ret0
-}
-
-// GCalFileStore indicates an expected call of GCalFileStore
-func (mr *MockFactoryMockRecorder) GCalFileStore() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GCalFileStore", reflect.TypeOf((*MockFactory)(nil).GCalFileStore))
+func (mr *MockFactoryMockRecorder) Service(fitbitConfig, gcalConfig, fbst, gst interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockFactory)(nil).Service), fitbitConfig, gcalConfig, fbst, gst)
 }
 
 // FitbitClient mocks base method

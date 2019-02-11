@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -48,7 +49,7 @@ func NewCommand(
 }
 
 var (
-	port    = kingpin.Flag("port", "Port of application").Default("8080").Envar("GAE_FITBIT_GO_PORT").String()
+	port    = kingpin.Flag("port", "Port of application").Default("8080").Envar("PORT").String()
 	verbose = kingpin.Flag("verbose", "Verbosing application").Short('v').Default("false").Bool()
 	// fitbit options
 	fbClientID        = kingpin.Flag("fb-client-id", "Fitbit Client ID").Envar("GAE_FITBIT_GO_FITBIT_CLIENT_ID").String()

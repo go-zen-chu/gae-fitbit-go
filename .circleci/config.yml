@@ -21,8 +21,9 @@ jobs:
             go get github.com/onsi/gomega/...
             go get github.com/onsi/ginkgo/ginkgo
 
+            export GO111MODULE=on
             # solve dependency
-            dep ensure
+            go mod download
       - run:
           name: "Run test"
           command: |

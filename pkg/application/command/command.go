@@ -137,7 +137,7 @@ func (c *command) Run() error {
 	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), gaHandler.HandleGCalAuthCode)
 
 	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal/today", apiVersion), f2gService.HandleFitbit2GCal)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal/today", apiVersion), f2gService.)
 
 	log.Infof("Running gae-fitbit-go on : %s", *port)
 	return c.httpServer.Run(*port)

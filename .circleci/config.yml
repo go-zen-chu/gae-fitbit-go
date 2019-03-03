@@ -5,7 +5,7 @@ jobs:
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.11.4
         environment:
-          GO111MODULE: "ON"
+          GO111MODULE: on
     working_directory: /go/src/github.com/go-zen-chu/gae-fitbit-go
 
     steps:

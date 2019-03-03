@@ -11,7 +11,7 @@
 # from your .gitignore file, remove the corresponding line
 # below:
 .git
-.gitignore
+#.gitignore
 
 # Binaries for programs and plugins
 *.exe
@@ -24,7 +24,6 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-
 # custom
 mock_*
 .envrc
@@ -33,3 +32,6 @@ cred*.json
 gcal*.json
 LICENSE
 README.md
+.github/
+vendor/
+docs/

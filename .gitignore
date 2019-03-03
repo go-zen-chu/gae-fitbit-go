@@ -5,8 +5,7 @@ vendor/
 fitbit*.json
 cred*.json
 gcal*.json
-app/gae-fitbit-go/*.json
-app/gae-fitbit-go/app.private.yaml
+*account.json
 .envrc
 
 ### https://raw.github.com/github/gitignore/ab477818977684f0f6ff370da9508e08944bc8c8/Global/Windows.gitignore

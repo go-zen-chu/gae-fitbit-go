@@ -4,6 +4,8 @@ jobs:
     docker:
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.11.4
+        environment:
+          GO111MODULE: "ON"
     working_directory: /go/src/github.com/go-zen-chu/gae-fitbit-go
 
     steps:
@@ -17,15 +19,12 @@ jobs:
             echo "GOPATH= $GOPATH"
             echo "PATH= $PATH"
 
-            # install test tools
-            go get github.com/onsi/gomega/...
-            go get github.com/onsi/ginkgo/ginkgo
-
-            export GO111MODULE=on
             # solve dependency
             go mod download
       - run:
           name: "Run test"
           command: |
+            # install test tools
+            go get github.com/onsi/gomega/...
+            go get github.com/onsi/ginkgo/ginkgo
             ginkgo -r -v .
-

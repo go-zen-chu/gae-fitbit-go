@@ -3,10 +3,11 @@ package fitbitauth
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
-	"net/http"
 )
 
 // FitbitAuthHandler : Manage any authorization process against Fitbit API
@@ -43,28 +44,24 @@ func (fah *fitbitAuthHandler) HandleFitbitAuthCode(w http.ResponseWriter, r *htt
 	keys, ok := r.URL.Query()["code"]
 	var err error
 	if !ok || len(keys[0]) < 1 {
-		err = errors.New("Could not get auth code from request")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		log.Errorln("Could not get auth code from request")
+		http.Error(w, "Failed to handle Fitbit Auth Code", 500)
 		return
 	}
 	// auth code is one time, no need to save it
 	code := keys[0]
-	log.Debugf("auth code :%s", code)
 
 	token, err := fah.oauthClient.Exchange(code)
 	if err != nil {
-		err = errors.Wrap(err, "Error while getting token")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		log.Errorln(errors.Wrap(err, "Error while getting token"))
+		http.Error(w, "Failed while getting Fitbit token", 500)
 		return
 	}
 
 	err = fah.store.WriteFitbitToken(token)
 	if err != nil {
-		err = errors.Wrap(err, "Error while storing token")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		log.Errorln(errors.Wrap(err, "Error while storing token"))
+		http.Error(w, "Error while storing Fitbit token", 500)
 		return
 	}
 	log.Info("Success storing fitbit tokens")

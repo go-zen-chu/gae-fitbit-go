@@ -70,7 +70,6 @@ func (s *service) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error getting data from Fitbit", http.StatusInternalServerError)
 		return
 	}
-	log.Infof("%v %v", sleeps, activities)
 
 	for _, sleep := range sleeps {
 		events, err := convertSleep2Events(&sleep)

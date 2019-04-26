@@ -35,6 +35,7 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 
 // FileStore mocks base method
 func (m *MockFactory) FileStore() (Store, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FileStore")
 	ret0, _ := ret[0].(Store)
 	ret1, _ := ret[1].(error)
@@ -43,11 +44,13 @@ func (m *MockFactory) FileStore() (Store, error) {
 
 // FileStore indicates an expected call of FileStore
 func (mr *MockFactoryMockRecorder) FileStore() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FileStore", reflect.TypeOf((*MockFactory)(nil).FileStore))
 }
 
 // FitbitAuthHandler mocks base method
 func (m *MockFactory) FitbitAuthHandler(store Store, config *oauth2.Config) FitbitAuthHandler {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FitbitAuthHandler", store, config)
 	ret0, _ := ret[0].(FitbitAuthHandler)
 	return ret0
@@ -55,11 +58,13 @@ func (m *MockFactory) FitbitAuthHandler(store Store, config *oauth2.Config) Fitb
 
 // FitbitAuthHandler indicates an expected call of FitbitAuthHandler
 func (mr *MockFactoryMockRecorder) FitbitAuthHandler(store, config interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FitbitAuthHandler", reflect.TypeOf((*MockFactory)(nil).FitbitAuthHandler), store, config)
 }
 
 // OAuthClient mocks base method
 func (m *MockFactory) OAuthClient(config *oauth2.Config) OAuthClient {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OAuthClient", config)
 	ret0, _ := ret[0].(OAuthClient)
 	return ret0
@@ -67,11 +72,13 @@ func (m *MockFactory) OAuthClient(config *oauth2.Config) OAuthClient {
 
 // OAuthClient indicates an expected call of OAuthClient
 func (mr *MockFactoryMockRecorder) OAuthClient(config interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OAuthClient", reflect.TypeOf((*MockFactory)(nil).OAuthClient), config)
 }
 
 // CloudStorageStore mocks base method
 func (m *MockFactory) CloudStorageStore(bucketName string) (Store, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CloudStorageStore", bucketName)
 	ret0, _ := ret[0].(Store)
 	ret1, _ := ret[1].(error)
@@ -80,5 +87,6 @@ func (m *MockFactory) CloudStorageStore(bucketName string) (Store, error) {
 
 // CloudStorageStore indicates an expected call of CloudStorageStore
 func (mr *MockFactoryMockRecorder) CloudStorageStore(bucketName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloudStorageStore", reflect.TypeOf((*MockFactory)(nil).CloudStorageStore), bucketName)
 }

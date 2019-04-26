@@ -35,6 +35,7 @@ func (m *MockGCalClient) EXPECT() *MockGCalClientMockRecorder {
 
 // InsertEvent mocks base method
 func (m *MockGCalClient) InsertEvent(event *v3.Event, dataType string) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertEvent", event, dataType)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -42,5 +43,6 @@ func (m *MockGCalClient) InsertEvent(event *v3.Event, dataType string) error {
 
 // InsertEvent indicates an expected call of InsertEvent
 func (mr *MockGCalClientMockRecorder) InsertEvent(event, dataType interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertEvent", reflect.TypeOf((*MockGCalClient)(nil).InsertEvent), event, dataType)
 }

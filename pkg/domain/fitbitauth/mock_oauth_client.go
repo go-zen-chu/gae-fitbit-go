@@ -35,6 +35,7 @@ func (m *MockOAuthClient) EXPECT() *MockOAuthClientMockRecorder {
 
 // GetAuthCodeURL mocks base method
 func (m *MockOAuthClient) GetAuthCodeURL() string {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAuthCodeURL")
 	ret0, _ := ret[0].(string)
 	return ret0
@@ -42,11 +43,13 @@ func (m *MockOAuthClient) GetAuthCodeURL() string {
 
 // GetAuthCodeURL indicates an expected call of GetAuthCodeURL
 func (mr *MockOAuthClientMockRecorder) GetAuthCodeURL() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthCodeURL", reflect.TypeOf((*MockOAuthClient)(nil).GetAuthCodeURL))
 }
 
 // Exchange mocks base method
 func (m *MockOAuthClient) Exchange(authCode string) (*oauth2.Token, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Exchange", authCode)
 	ret0, _ := ret[0].(*oauth2.Token)
 	ret1, _ := ret[1].(error)
@@ -55,5 +58,6 @@ func (m *MockOAuthClient) Exchange(authCode string) (*oauth2.Token, error) {
 
 // Exchange indicates an expected call of Exchange
 func (mr *MockOAuthClientMockRecorder) Exchange(authCode interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exchange", reflect.TypeOf((*MockOAuthClient)(nil).Exchange), authCode)
 }

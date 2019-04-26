@@ -35,6 +35,7 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 
 // WriteFitbitToken mocks base method
 func (m *MockStore) WriteFitbitToken(token *oauth2.Token) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriteFitbitToken", token)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -42,11 +43,13 @@ func (m *MockStore) WriteFitbitToken(token *oauth2.Token) error {
 
 // WriteFitbitToken indicates an expected call of WriteFitbitToken
 func (mr *MockStoreMockRecorder) WriteFitbitToken(token interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteFitbitToken", reflect.TypeOf((*MockStore)(nil).WriteFitbitToken), token)
 }
 
 // FetchFitbitToken mocks base method
 func (m *MockStore) FetchFitbitToken() (*oauth2.Token, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FetchFitbitToken")
 	ret0, _ := ret[0].(*oauth2.Token)
 	ret1, _ := ret[1].(error)
@@ -55,5 +58,6 @@ func (m *MockStore) FetchFitbitToken() (*oauth2.Token, error) {
 
 // FetchFitbitToken indicates an expected call of FetchFitbitToken
 func (mr *MockStoreMockRecorder) FetchFitbitToken() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchFitbitToken", reflect.TypeOf((*MockStore)(nil).FetchFitbitToken))
 }

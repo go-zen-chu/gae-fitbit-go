@@ -17,15 +17,17 @@ type GCalAuthHandler interface {
 }
 
 type gcalAuthHandler struct {
-	factory Factory
+	factory     Factory
+	store       Store
 	oauthConfig *oauth2.Config
-	oauthClient  OAuthClient
+	oauthClient OAuthClient
 }
 
-func NewGCalAuthHandler(gaf Factory, oauthConfig *oauth2.Config) GCalAuthHandler {
+func NewGCalAuthHandler(gaf Factory, store Store, oauthConfig *oauth2.Config) GCalAuthHandler {
 	oauthClient := gaf.OAuthClient(oauthConfig)
 	return &gcalAuthHandler{
-		factory: gaf,
+		factory:     gaf,
+		store:       store,
 		oauthConfig: oauthConfig,
 		oauthClient: oauthClient,
 	}
@@ -42,39 +44,27 @@ func (gah *gcalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Re
 	keys, ok := r.URL.Query()["code"]
 	var err error
 	if !ok || len(keys[0]) < 1 {
-		err = errors.New("Could not get auth code from request")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		log.Errorln("Could not get auth code from request")
+		http.Error(w, "Error getting Google Calendar Auth Code", 500)
 		return
 	}
 	// auth code is one time, no need to save it
 	code := keys[0]
 	log.Debugf("auth code :%s", code)
 
-	fst, err := gah.factory.FileStore()
-	if err != nil {
-		err = errors.Wrap(err, "Error while getting store")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	token, err := gah.oauthClient.Exchange(code)
 	if err != nil {
-		err = errors.Wrap(err, "Error while getting token")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		log.Errorln(errors.Wrap(err, "Error while getting token"))
+		http.Error(w, "Error getting Google Calendar token", 500)
 		return
 	}
 
-	err = fst.WriteGCalToken(token)
+	err = gah.store.WriteGCalToken(token)
 	if err != nil {
-		err = errors.Wrap(err, "Error while storing token")
-		log.Errorln(err)
-		http.Error(w, err.Error(), 500)
+		log.Errorln(errors.Wrap(err, "Error while storing token"))
+		http.Error(w, "Error storing Google Calendar token", 500)
 		return
 	}
-
 	log.Info("Success storing gcal tokens")
 	fmt.Fprintf(w, "OK")
 }

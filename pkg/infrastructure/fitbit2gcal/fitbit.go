@@ -20,13 +20,13 @@ const (
 )
 
 type fitbitClient struct {
-	store dfba.Store
+	store  dfba.Store
 	config *df2g.FitbitConfig
 }
 
 func NewFitbitClient(store dfba.Store, config *df2g.FitbitConfig) df2g.FitbitClient {
 	return &fitbitClient{
-		store: store,
+		store:  store,
 		config: config,
 	}
 }
@@ -38,7 +38,7 @@ func (fc *fitbitClient) GetSleepData(dateStr string) (*df2g.Sleep, error) {
 	}
 	cli := fc.config.OauthConfig.Client(context.Background(), token)
 	// make sure to save new token refreshed via oauth2 library
-	defer func () {
+	defer func() {
 		if err := fc.store.WriteFitbitToken(token); err != nil {
 			log.Errorf("%v\n", err)
 		}
@@ -57,7 +57,7 @@ func (fc *fitbitClient) GetActivityData(dateStr string) (*df2g.Activity, error) 
 	}
 	cli := fc.config.OauthConfig.Client(context.Background(), token)
 	// make sure to save new token refreshed via oauth2 library
-	defer func () {
+	defer func() {
 		if err := fc.store.WriteFitbitToken(token); err != nil {
 			log.Errorf("%v\n", err)
 		}
@@ -94,7 +94,6 @@ func requestActivityData(cli *http.Client, dateStr string) (*df2g.Activity, erro
 	}
 	return &a, nil
 }
-
 
 func requestFitbitData(cli *http.Client, dataType, dateStr string) ([]byte, error) {
 	u := &url.URL{}

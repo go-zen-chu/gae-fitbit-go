@@ -14,13 +14,13 @@ import (
 
 var _ = Describe("fitbitauth", func() {
 	var (
-		c     *gomock.Controller
-		mf *MockFactory
-		ms *MockStore
-		moc *MockOAuthClient
-		fah   FitbitAuthHandler
+		c      *gomock.Controller
+		mf     *MockFactory
+		ms     *MockStore
+		moc    *MockOAuthClient
+		fah    FitbitAuthHandler
 		config *oauth2.Config
-		token    *oauth2.Token
+		token  *oauth2.Token
 	)
 
 	BeforeEach(func() {
@@ -30,22 +30,22 @@ var _ = Describe("fitbitauth", func() {
 		moc = NewMockOAuthClient(c)
 
 		config = &oauth2.Config{
-			ClientID: "fb-client-id",
+			ClientID:     "fb-client-id",
 			ClientSecret: "fb-client-secret",
-			Endpoint: fitbit.Endpoint,
-			RedirectURL: "http://127.0.0.1:8080/v1/fitbitstoretoken",
-			Scopes: []string { "sleep", "activity" },
+			Endpoint:     fitbit.Endpoint,
+			RedirectURL:  "http://127.0.0.1:8080/v1/fitbitstoretoken",
+			Scopes:       []string{"sleep", "activity"},
 		}
 		token = &oauth2.Token{
 			AccessToken:  "access-token",
 			RefreshToken: "refresh-token",
 			TokenType:    "refresh",
-			Expiry: time.Now().Add(8 * time.Hour),
+			Expiry:       time.Now().Add(8 * time.Hour),
 		}
 		mf.EXPECT().FileStore().Return(ms, nil)
 		mf.EXPECT().OAuthClient(config).Return(moc)
 
-		fah = NewFitbitAuthHandler(mf, config)
+		fah = NewFitbitAuthHandler(mf, ms, config)
 	})
 
 	Describe("HandleFitbitAuthCode", func() {

@@ -86,7 +86,7 @@ type ActivityData struct {
 	HasGPS            bool            `json:"hasGps"`
 	LastModified      string          `json:"lastModified"`
 	LogID             int             `json:"logId"`
-	LogType           string             `json:"logType"`
+	LogType           string          `json:"logType"`
 	OriginalDuration  int             `json:"originalDuration"`
 	OriginalStartTime string          `json:"originakStartTime"`
 	StartTime         string          `json:"startTime"`

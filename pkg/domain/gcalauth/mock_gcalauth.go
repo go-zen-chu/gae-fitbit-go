@@ -35,20 +35,24 @@ func (m *MockGCalAuthHandler) EXPECT() *MockGCalAuthHandlerMockRecorder {
 
 // Redirect2GCal mocks base method
 func (m *MockGCalAuthHandler) Redirect2GCal(w http.ResponseWriter, r *http.Request) {
+	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Redirect2GCal", w, r)
 }
 
 // Redirect2GCal indicates an expected call of Redirect2GCal
 func (mr *MockGCalAuthHandlerMockRecorder) Redirect2GCal(w, r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Redirect2GCal", reflect.TypeOf((*MockGCalAuthHandler)(nil).Redirect2GCal), w, r)
 }
 
 // HandleGCalAuthCode mocks base method
 func (m *MockGCalAuthHandler) HandleGCalAuthCode(w http.ResponseWriter, r *http.Request) {
+	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "HandleGCalAuthCode", w, r)
 }
 
 // HandleGCalAuthCode indicates an expected call of HandleGCalAuthCode
 func (mr *MockGCalAuthHandlerMockRecorder) HandleGCalAuthCode(w, r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleGCalAuthCode", reflect.TypeOf((*MockGCalAuthHandler)(nil).HandleGCalAuthCode), w, r)
 }

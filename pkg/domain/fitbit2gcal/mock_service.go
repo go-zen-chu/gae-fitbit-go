@@ -35,10 +35,24 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 
 // HandleFitbit2GCal mocks base method
 func (m *MockService) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
+	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "HandleFitbit2GCal", w, r)
 }
 
 // HandleFitbit2GCal indicates an expected call of HandleFitbit2GCal
 func (mr *MockServiceMockRecorder) HandleFitbit2GCal(w, r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleFitbit2GCal", reflect.TypeOf((*MockService)(nil).HandleFitbit2GCal), w, r)
+}
+
+// HandleFitbit2GCalToday mocks base method
+func (m *MockService) HandleFitbit2GCalToday(w http.ResponseWriter, r *http.Request) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "HandleFitbit2GCalToday", w, r)
+}
+
+// HandleFitbit2GCalToday indicates an expected call of HandleFitbit2GCalToday
+func (mr *MockServiceMockRecorder) HandleFitbit2GCalToday(w, r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleFitbit2GCalToday", reflect.TypeOf((*MockService)(nil).HandleFitbit2GCalToday), w, r)
 }

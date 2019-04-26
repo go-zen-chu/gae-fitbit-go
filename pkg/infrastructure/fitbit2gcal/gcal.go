@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
-	dga"github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
-	"google.golang.org/api/calendar/v3"
+	dga "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/api/calendar/v3"
 )
 
 type gcalClient struct {
@@ -38,7 +38,7 @@ func (gc *gcalClient) InsertEvent(event *calendar.Event, dataType string) error 
 		return err
 	}
 	// make sure to save new token refreshed via oauth2 library
-	defer func () {
+	defer func() {
 		if err := gc.store.WriteGCalToken(token); err != nil {
 			log.Errorf("%v\n", err)
 		}

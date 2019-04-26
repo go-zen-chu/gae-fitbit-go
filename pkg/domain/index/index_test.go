@@ -17,12 +17,12 @@ var _ = Describe("Index", func() {
 			ts *httptest.Server
 		)
 
-		BeforeEach(func () {
+		BeforeEach(func() {
 			ih = index.NewIndexHandler()
 			ts = httptest.NewServer(http.HandlerFunc(ih.HandleIndex))
 		})
 
-		AfterEach(func(){
+		AfterEach(func() {
 			defer ts.Close()
 		})
 
@@ -35,5 +35,3 @@ var _ = Describe("Index", func() {
 		})
 	})
 })
-
-

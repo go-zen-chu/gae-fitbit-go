@@ -16,8 +16,16 @@ func (f *factory) FileStore() (dfba.Store, error) {
 	return fs, nil
 }
 
-func (f *factory) FitbitAuthHandler(config *oauth2.Config) dfba.FitbitAuthHandler {
-	return dfba.NewFitbitAuthHandler(f, config)
+func (f *factory) CloudStorageStore(bucketName string) (dfba.Store, error) {
+	css, err := NewCloudStorageStore(bucketName)
+	if err != nil {
+		return nil, err
+	}
+	return css, nil
+}
+
+func (f *factory) FitbitAuthHandler(store dfba.Store, config *oauth2.Config) dfba.FitbitAuthHandler {
+	return dfba.NewFitbitAuthHandler(f, store, config)
 }
 
 func (f *factory) OAuthClient(config *oauth2.Config) dfba.OAuthClient {

@@ -16,8 +16,16 @@ func (f *factory) FileStore() (dga.Store, error) {
 	return fs, nil
 }
 
-func (f *factory) GCalAuthHandler(oauthConfig *oauth2.Config) dga.GCalAuthHandler {
-	return dga.NewGCalAuthHandler(f,oauthConfig)
+func (f *factory) CloudStorageStore(bucketName string) (dga.Store, error) {
+	css, err := NewCloudStorageStore(bucketName)
+	if err != nil {
+		return nil, err
+	}
+	return css, nil
+}
+
+func (f *factory) GCalAuthHandler(store dga.Store, oauthConfig *oauth2.Config) dga.GCalAuthHandler {
+	return dga.NewGCalAuthHandler(f, store, oauthConfig)
 }
 
 func (f *factory) NewOAuthClient(oauthConfig *oauth2.Config) dga.OAuthClient {

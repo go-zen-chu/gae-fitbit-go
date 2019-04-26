@@ -1,0 +1,5 @@
+cron:
+  - description: "daily request job"
+    url: /v1/fitbit2gcal/today
+    schedule: every 1 hours from 10:00 to 11:00
+    timezone: Asia/Tokyo # put your timezone :)

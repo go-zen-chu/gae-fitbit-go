@@ -4,18 +4,18 @@ import (
 	"context"
 	"errors"
 
+	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
-	dga "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/api/calendar/v3"
+	calendar "google.golang.org/api/calendar/v3"
 )
 
 type gcalClient struct {
-	store      dga.Store
+	store      da.Store
 	gcalConfig *df2g.GCalConfig
 }
 
-func NewGCalClient(store dga.Store, gcalConfig *df2g.GCalConfig) df2g.GCalClient {
+func NewGCalClient(store da.Store, gcalConfig *df2g.GCalConfig) df2g.GCalClient {
 	return &gcalClient{
 		store:      store,
 		gcalConfig: gcalConfig,

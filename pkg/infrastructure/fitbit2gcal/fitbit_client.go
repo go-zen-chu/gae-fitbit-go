@@ -10,8 +10,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
-	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
 	"github.com/pkg/errors"
 )
 
@@ -20,11 +20,11 @@ const (
 )
 
 type fitbitClient struct {
-	store  dfba.Store
+	store  da.Store
 	config *df2g.FitbitConfig
 }
 
-func NewFitbitClient(store dfba.Store, config *df2g.FitbitConfig) df2g.FitbitClient {
+func NewFitbitClient(store da.Store, config *df2g.FitbitConfig) df2g.FitbitClient {
 	return &fitbitClient{
 		store:  store,
 		config: config,

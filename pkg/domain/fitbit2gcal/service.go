@@ -3,10 +3,7 @@ package fitbit2gcal
 
 import (
 	"fmt"
-	"net/http"
 	"time"
-
-	"google.golang.org/api/calendar/v3"
 
 	"github.com/pkg/errors"
 
@@ -14,8 +11,8 @@ import (
 )
 
 type Service interface {
-	HandleFitbit2GCal(w http.ResponseWriter, r *http.Request)
-	HandleFitbit2GCalToday(w http.ResponseWriter, r *http.Request)
+	Fitbit2GCal(fromDate, toDate time.Time) error
+	Fitbit2GCalToday() error
 }
 
 type service struct {
@@ -34,56 +31,25 @@ func NewService(fbc FitbitClient, gc GCalClient) Service {
 	}
 }
 
-func (s *service) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	fromDateStr := q.Get("from_date")
-	toDateStr := q.Get("to_date")
-	log.Debugf("request %s %s", fromDateStr, toDateStr)
-
-	var err error
-	if fromDateStr == "" || toDateStr == "" {
-		log.Errorln(errors.New("Insufficient params fromDate, toDate"))
-		http.Error(w, "Insufficient params fromDate, toDate", http.StatusBadRequest)
-		return
-	}
-	fromDate, err := time.Parse(dateLayout, fromDateStr)
-	if err != nil {
-		log.Errorln(errors.Wrap(err, "Error parsing from_date"))
-		http.Error(w, "Error parsing from_date", http.StatusBadRequest)
-		return
-	}
-	toDate, err := time.Parse(dateLayout, toDateStr)
-	if err != nil {
-		log.Errorln(errors.Wrap(err, "Error parsing to_date"))
-		http.Error(w, "Error parsing to_date", http.StatusBadRequest)
-		return
-	}
+func (s *service) Fitbit2GCal(fromDate, toDate time.Time) error {
 	if fromDate.After(toDate) {
-		log.Errorln(errors.New("Invalid parameter fromDate > toDate"))
-		http.Error(w, "Invalid parameter. fromDate must be before than toDate", http.StatusBadRequest)
-		return
+		return errors.New("Invalid parameter fromDate > toDate")
 	}
-
 	sleeps, activities, err := s.getFitbitData(fromDate, toDate)
 	if err != nil {
-		log.Errorln(errors.Wrap(err, "Error getting data from Fitbit"))
-		http.Error(w, "Error getting data from Fitbit", http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "Error getting data from Fitbit")
 	}
-
 	for _, sleep := range sleeps {
 		events, err := convertSleep2Events(&sleep)
 		if err != nil {
 			log.Errorln(err)
-			http.Error(w, "Error parsing sleep data of Fitbit", http.StatusInternalServerError)
-			return
+			return err
 		}
 		for _, event := range events {
 			err = s.gcalClient.InsertEvent(&event, "sleep")
 			if err != nil {
 				log.Errorln(err)
-				http.Error(w, "Error inserting sleep data to Google Calendar", http.StatusInternalServerError)
-				return
+				return err
 			}
 		}
 	}
@@ -91,63 +57,24 @@ func (s *service) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
 		events, err := convertActivity2Events(&act)
 		if err != nil {
 			log.Errorln(err)
-			http.Error(w, "Error parsing activity data of Fitbit", http.StatusInternalServerError)
-			return
+			return err
 		}
 		for _, event := range events {
 			err = s.gcalClient.InsertEvent(&event, "activity")
 			if err != nil {
 				log.Errorln(err)
-				http.Error(w, "Error inserting activity data to Google Calendar", http.StatusInternalServerError)
-				return
+				return err
 			}
 		}
 	}
-	fmt.Fprint(w, "OK")
+	return nil
 }
 
-func (s *service) HandleFitbit2GCalToday(w http.ResponseWriter, r *http.Request) {
+func (s *service) Fitbit2GCalToday() error {
 	now := time.Now()
 	yesterday := now.AddDate(0, 0, -1)
-	sleeps, activities, err := s.getFitbitData(yesterday, now)
-	if err != nil {
-		log.Errorln(errors.Wrap(err, "Error getting data from Fitbit"))
-		http.Error(w, "Error getting data from Fitbit", http.StatusInternalServerError)
-		return
-	}
-	for _, sleep := range sleeps {
-		events, err := convertSleep2Events(&sleep)
-		if err != nil {
-			log.Errorln(err)
-			http.Error(w, "Error parsing sleep data of Fitbit", http.StatusInternalServerError)
-			return
-		}
-		for _, event := range events {
-			err = s.gcalClient.InsertEvent(&event, "sleep")
-			if err != nil {
-				log.Errorln(err)
-				http.Error(w, "Error inserting sleep data to Google Calendar", http.StatusInternalServerError)
-				return
-			}
-		}
-	}
-	for _, act := range activities {
-		events, err := convertActivity2Events(&act)
-		if err != nil {
-			log.Errorln(err)
-			http.Error(w, "Error parsing activity data of Fitbit", http.StatusInternalServerError)
-			return
-		}
-		for _, event := range events {
-			err = s.gcalClient.InsertEvent(&event, "activity")
-			if err != nil {
-				log.Errorln(err)
-				http.Error(w, "Error inserting activity data to Google Calendar", http.StatusInternalServerError)
-				return
-			}
-		}
-	}
-	fmt.Fprint(w, "OK")
+	err := HandleFitbit2GCal(yesterday, now)
+	return err
 }
 
 // getFitbitData : Get sleep, activity duration data from fitbit
@@ -239,7 +166,6 @@ func convertSleep2Events(sleep *Sleep) ([]calendar.Event, error) {
 
 func convertActivity2Events(activity *Activity) ([]calendar.Event, error) {
 	var events []calendar.Event
-
 	tz := "Asia/Tokyo"
 	lc, err := time.LoadLocation(tz)
 	if err != nil {

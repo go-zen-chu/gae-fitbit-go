@@ -3,17 +3,12 @@ package command
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/fitbit"
 
-	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
-	dfba "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbitauth"
-	dga "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/gcalauth"
-	"github.com/go-zen-chu/gae-fitbit-go/pkg/domain/index"
-	"google.golang.org/api/calendar/v3"
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/go-zen-chu/gae-fitbit-go/pkg/di"
+	"github.com/go-zen-chu/gae-fitbit-go/pkg/interface/handler"
 )
 
 const (
@@ -25,26 +20,12 @@ type Command interface {
 }
 
 type command struct {
-	indexHandler       index.IndexHandler
-	fitbitauthFactory  dfba.Factory
-	gcalauthFactory    dga.Factory
-	fitbit2gcalFactory df2g.Factory
-	httpServer         HttpServer
+	httpServer HttpServer
 }
 
-func NewCommand(
-	indexHandler index.IndexHandler,
-	fitbitauthFactory dfba.Factory,
-	gcalauthFactory dga.Factory,
-	fitbit2gcalFactory df2g.Factory,
-	httpServer HttpServer,
-) Command {
+func NewCommand(httpServer HttpServer) Command {
 	return &command{
-		indexHandler:       indexHandler,
-		fitbitauthFactory:  fitbitauthFactory,
-		gcalauthFactory:    gcalauthFactory,
-		fitbit2gcalFactory: fitbit2gcalFactory,
-		httpServer:         httpServer,
+		httpServer: httpServer,
 	}
 }
 
@@ -72,40 +53,21 @@ func (c *command) Run() error {
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
 	}
-	var err error
-	var fbaStore dfba.Store
-	var gaStore dga.Store
+	// initialize di and objects
+	di := di.NewDI()
 	if *useCloudStorage {
-		fbaStore, err = c.fitbitauthFactory.CloudStorageStore(*cloudStorageBucketName)
-		if err != nil {
-			return errors.Wrap(err, "Error while making cloud storage store")
-		}
-		gaStore, err = c.gcalauthFactory.CloudStorageStore(*cloudStorageBucketName)
-		if err != nil {
-			return errors.Wrap(err, "Error while making cloud storage store")
-		}
+		di.InitAuthCloudStorageStore(*cloudStorageBucketName)
 	} else {
-		fbaStore, err = c.fitbitauthFactory.FileStore()
-		if err != nil {
-			return errors.Wrap(err, "Error while making file store")
-		}
-		gaStore, err = c.gcalauthFactory.FileStore()
-		if err != nil {
-			return errors.Wrap(err, "Error while making file store")
-		}
+		di.InitAuthFileStore()
 	}
-
-	// create handlers
-	fbOauthConfig := &oauth2.Config{
+	di.InitFitbitOAuthConfig(&oauth2.Config{
 		ClientID:     *fbClientID,
 		ClientSecret: *fbClientSecret,
 		Endpoint:     fitbit.Endpoint,
 		RedirectURL:  *fbAuthRedirectURI,
 		Scopes:       []string{"sleep", "activity"},
-	}
-	fbaHandler := c.fitbitauthFactory.FitbitAuthHandler(fbaStore, fbOauthConfig)
-
-	gcalOauthConfig := &oauth2.Config{
+	})
+	di.InitGCalOAuthConfig(&oauth2.Config{
 		ClientID:     *gcalClientID,
 		ClientSecret: *gcalClientSecret,
 		Endpoint: oauth2.Endpoint{
@@ -114,30 +76,22 @@ func (c *command) Run() error {
 		},
 		RedirectURL: *gcalAuthRedirectURI,
 		Scopes:      []string{calendar.CalendarEventsScope},
-	}
-	gaHandler := c.gcalauthFactory.GCalAuthHandler(gaStore, gcalOauthConfig)
+	})
+	di.InitGCalConfig(*gcalSleepCalendarID, *gcalActivityCalendarID)
 
-	fitbitConfig := &df2g.FitbitConfig{
-		OauthConfig: fbOauthConfig,
-	}
-	gcalConfig := &df2g.GCalConfig{
-		SleepCalendarID:    *gcalSleepCalendarID,
-		ActivityCalendarID: *gcalActivityCalendarID,
-		OauthConfig:        gcalOauthConfig,
-	}
-	f2gService := c.fitbit2gcalFactory.Service(fitbitConfig, gcalConfig, fbaStore, gaStore)
+	h := handler.NewHandler(di)
 
 	// Register http handler to routes
-	c.httpServer.HandleFunc("/index.html", c.indexHandler.HandleIndex)
+	c.httpServer.HandleFunc("/index.html", h.GetIndex)
 
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), fbaHandler.Redirect2Fitbit)
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbitstoretoken", apiVersion), fbaHandler.HandleFitbitAuthCode)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbitauth", apiVersion), h.Redirect2Fitbit)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbitstoretoken", apiVersion), h.GetFitbitAuthCode)
 
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalauth", apiVersion), gaHandler.Redirect2GCal)
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), gaHandler.HandleGCalAuthCode)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalauth", apiVersion), h.Redirect2GCal)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/gcalstoretoken", apiVersion), h.GetGCalAuthCode)
 
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), f2gService.HandleFitbit2GCal)
-	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal/today", apiVersion), f2gService.HandleFitbit2GCalToday)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal", apiVersion), h.GetFitbit2GCal)
+	c.httpServer.HandleFunc(fmt.Sprintf("/%s/fitbit2gcal/today", apiVersion), h.GetFitbit2GCalToday)
 
 	log.Infof("Running gae-fitbit-go on : %s", *port)
 	return c.httpServer.Run(*port)

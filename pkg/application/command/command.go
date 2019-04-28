@@ -6,6 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/fitbit"
+	calendar "google.golang.org/api/calendar/v3"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/go-zen-chu/gae-fitbit-go/pkg/di"
 	"github.com/go-zen-chu/gae-fitbit-go/pkg/interface/handler"

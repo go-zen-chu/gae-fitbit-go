@@ -1,7 +1,7 @@
 package di
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
 	ia "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/auth"
@@ -27,7 +27,7 @@ func (di DI) FitbitOAuthClient() da.OAuthClient {
 	if di[key] == nil {
 		di[key] = da.NewOAuthClient(di.FitbitOAuthConfig())
 	}
-	return di[key].(*oauth2.Config)
+	return di[key].(da.OAuthClient)
 }
 
 func (di DI) InitGCalOAuthConfig(config *oauth2.Config) {
@@ -48,12 +48,12 @@ func (di DI) GCalOAuthClient() da.OAuthClient {
 	if di[key] == nil {
 		di[key] = da.NewOAuthClient(di.GCalOAuthConfig())
 	}
-	return di[key].(*oauth2.Config)
+	return di[key].(da.OAuthClient)
 }
 
 func (di DI) InitAuthFileStore() {
 	key := "AuthFileStore"
-
+	di[key] = ia.NewFileStore()
 }
 
 func (di DI) AuthFileStore() da.Store {
@@ -76,7 +76,7 @@ func (di DI) InitAuthCloudStorageStore(bucketName string) {
 func (di DI) AuthCloudStorageStore() da.Store {
 	key := "AuthCloudStorageStore"
 	if di[key] == nil {
-		di[key] = ia.NewCloudStorageStore()
+		panic(errors.New(key + " is nil. Need to be initialized"))
 	}
 	return di[key].(da.Store)
 }

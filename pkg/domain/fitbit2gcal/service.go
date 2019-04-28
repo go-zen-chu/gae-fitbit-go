@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
+	calendar "google.golang.org/api/calendar/v3"
 )
 
 type Service interface {
@@ -19,10 +20,6 @@ type service struct {
 	fitbitClient FitbitClient
 	gcalClient   GCalClient
 }
-
-const (
-	dateLayout = "20060102"
-)
 
 func NewService(fbc FitbitClient, gc GCalClient) Service {
 	return &service{
@@ -73,7 +70,7 @@ func (s *service) Fitbit2GCal(fromDate, toDate time.Time) error {
 func (s *service) Fitbit2GCalToday() error {
 	now := time.Now()
 	yesterday := now.AddDate(0, 0, -1)
-	err := HandleFitbit2GCal(yesterday, now)
+	err := s.Fitbit2GCal(yesterday, now)
 	return err
 }
 

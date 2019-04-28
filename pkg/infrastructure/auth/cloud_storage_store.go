@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"cloud.google.com/go/storage"
+
 	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"

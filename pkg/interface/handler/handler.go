@@ -10,6 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	dateLayout = "20060102"
+)
+
 type Handler interface {
 	GetIndex(w http.ResponseWriter, r *http.Request)
 	Redirect2Fitbit(w http.ResponseWriter, r *http.Request)
@@ -48,7 +52,7 @@ func (h *handler) GetFitbitAuthCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	code := keys[0]
-	if err := h.di.AuthService().HandleFitbitAuthCode(code); err {
+	if err := h.di.AuthService().HandleFitbitAuthCode(code); err != nil {
 		log.Errorln(errors.Wrap(err, "Error while storing token"))
 		http.Error(w, "Error while handling Fitbit token", 500)
 		return
@@ -62,7 +66,7 @@ func (h *handler) Redirect2GCal(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, authURL, http.StatusSeeOther)
 }
 
-func (h *handler) GeteGCalAuthCode(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GetGCalAuthCode(w http.ResponseWriter, r *http.Request) {
 	keys, ok := r.URL.Query()["code"]
 	if !ok || len(keys[0]) < 1 {
 		log.Errorln("Could not get auth code from request")
@@ -70,7 +74,7 @@ func (h *handler) GeteGCalAuthCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	code := keys[0]
-	if err := h.di.AuthService().HandleGCalAuthCode(code); err {
+	if err := h.di.AuthService().HandleGCalAuthCode(code); err != nil {
 		log.Errorln(errors.Wrap(err, "Error while storing token"))
 		http.Error(w, "Error while handling GCal token", 500)
 		return
@@ -113,7 +117,7 @@ func (h *handler) GetFitbit2GCal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) GetFitbit2GCalToday(w http.ResponseWriter, r *http.Request) {
-	err = h.di.Fitbit2GCalService().Fitbit2GCalToday()
+	err := h.di.Fitbit2GCalService().Fitbit2GCalToday()
 	if err != nil {
 		log.Errorln(err.Error())
 		http.Error(w, "Error handling data", http.StatusInternalServerError)

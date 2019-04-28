@@ -6,8 +6,8 @@ package fitbit2gcal
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	http "net/http"
 	reflect "reflect"
+	time "time"
 )
 
 // MockService is a mock of Service interface
@@ -33,26 +33,30 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 	return m.recorder
 }
 
-// HandleFitbit2GCal mocks base method
-func (m *MockService) HandleFitbit2GCal(w http.ResponseWriter, r *http.Request) {
+// Fitbit2GCal mocks base method
+func (m *MockService) Fitbit2GCal(fromDate, toDate time.Time) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "HandleFitbit2GCal", w, r)
+	ret := m.ctrl.Call(m, "Fitbit2GCal", fromDate, toDate)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// HandleFitbit2GCal indicates an expected call of HandleFitbit2GCal
-func (mr *MockServiceMockRecorder) HandleFitbit2GCal(w, r interface{}) *gomock.Call {
+// Fitbit2GCal indicates an expected call of Fitbit2GCal
+func (mr *MockServiceMockRecorder) Fitbit2GCal(fromDate, toDate interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleFitbit2GCal", reflect.TypeOf((*MockService)(nil).HandleFitbit2GCal), w, r)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fitbit2GCal", reflect.TypeOf((*MockService)(nil).Fitbit2GCal), fromDate, toDate)
 }
 
-// HandleFitbit2GCalToday mocks base method
-func (m *MockService) HandleFitbit2GCalToday(w http.ResponseWriter, r *http.Request) {
+// Fitbit2GCalToday mocks base method
+func (m *MockService) Fitbit2GCalToday() error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "HandleFitbit2GCalToday", w, r)
+	ret := m.ctrl.Call(m, "Fitbit2GCalToday")
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// HandleFitbit2GCalToday indicates an expected call of HandleFitbit2GCalToday
-func (mr *MockServiceMockRecorder) HandleFitbit2GCalToday(w, r interface{}) *gomock.Call {
+// Fitbit2GCalToday indicates an expected call of Fitbit2GCalToday
+func (mr *MockServiceMockRecorder) Fitbit2GCalToday() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleFitbit2GCalToday", reflect.TypeOf((*MockService)(nil).HandleFitbit2GCalToday), w, r)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fitbit2GCalToday", reflect.TypeOf((*MockService)(nil).Fitbit2GCalToday))
 }

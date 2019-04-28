@@ -1,76 +1,62 @@
 @startuml
 
-interface fitbitauth.Factory {
-    +FileStore() (Store, error)
-    +FitbitAuthHandler(config *oauth2.Config) FitbitAuthHandler
-    +OAuthClient() OAuthClient
-}
-interface fitbitauth.OAuthClient {
-	+GetAuthCodeURL() string
-	+Exchange(authCode string) (*oauth2.Token, error)
-}
-interface fitbitauth.Store {
-    +WriteFitbitToken(token *oauth2.Token) error
-    +FetchFitbitToken() (*oauth2.Token, error)
-}
-interface fitbitauth.FitbitAuthHandler {
-    +Redirect2Fitbit(w http.ResponseWriter, r *http.Request)
-	+HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request)
+' di for factory since generative methods are not domain logic
+interface di.DI {
+  +InitializeAuthFileStore() auth.Store
+  +InitializeAuthCloudStorageStore() auth.Store
+  +BuildFitbit2GCalService() fitbit2gal.Service
 }
 
-fitbitauth.FitbitAuthHandler ..> fitbitauth.Factory
-fitbitauth.Factory --> fitbitauth.FitbitAuthHandler : gen
-fitbitauth.Factory --> fitbitauth.Store : gen
-fitbitauth.Factory --> fitbitauth.OAuthClient : gen
-
-
-interface gcalauth.Factory {
-    +FileStore() (Store, error)
-    +GCalAuthHandler(oauthConfig *oauth2.Config) GCalAuthHandler
-
-}
-interface gcalauth.OAuthClient {
-	+GetAuthCodeURL() string
-	+Exchange(authCode string) (*oauth2.Token, error)
-}
-interface gcalauth.Store {
-    +WriteGCalToken(token *oauth2.Token) error
-    +FetchGCalToken() (*oauth2.Token, error)
-}
-interface gcalauth.GCalAuthHandler {
-	+Redirect2GCal(w http.ResponseWriter, r *http.Request)
-	+HandleGCalAuthCode(w http.ResponseWriter, r *http.Request)
+' index domain
+interface index.Service {
+  +HandleIndex()
 }
 
-gcalauth.GCalAuthHandler ..> gcalauth.Factory
-gcalauth.Factory --> gcalauth.GCalAuthHandler : gen 
-gcalauth.Factory --> gcalauth.Store : gen
-gcalauth.Factory --> gcalauth.OAuthClient : gen
-
-
-interface fitbit2gcal.Factory {
-    +Service(fitbitConfig *FitbitConfig, gcalConfig *GCalConfig) Service
-    +FitbitFileStore() dfba.Store
-    +GCalFileStore() dga.Store
-    +FitbitClient(store dfba.Store, fitbitConfig *FitbitConfig) FitbitClient
-    +GCalClient(store dga.Store, gcalConfig *GCalConfig) GCalClient
+' auth domain for handling authentication
+interface auth.OAuthClient {
+  +GetAuthCodeURL() string
+  +Exchange(authCode string) (*oauth2.Token, error)
 }
-interface fitbit2gcal.Service {
-    +HandleFitbit2GCal(w http.ResponseWriter, r *http.Request)
+
+interface auth.Store {
+  +WriteFitbitToken(token *oauth2.Token) error
+  +FetchFitbitToken(token *oauth2.Token) error
+  +WriteGCalToken(token *oauth2.Token) error
+  +FetchGCalToken(token *oauth2.Token) error
 }
+
+interface auth.Service {
+  +Redirect2Fitbit(w http.ResponseWriter, r *http.Request)
+  +HandleFitbitAuthCode(w http.ResponseWriter, r *http.Request)
+  +Redirect2GCal(w http.ResponseWriter, r *http.Request)
+  +HandleGCalAuthCode(w http.ResponseWriter, r *http.Request)
+}
+
+di.DI <-- auth.Service
+auth.Service -> auth.Store
+
+' fitbit2gal domain is a core domain for handling data
+interface fitbit2gal.Service {
+  +HandleFitbit2GCal(w http.ResponseWriter, r *http.Request)
+}
+
 interface fitbit2gcal.FitbitClient {
     +GetSleepData(dateStr string) (*Sleep, error)
     +GetActivityData(dateStr string) (*Activity, error)
 }
+
 interface fitbit2gcal.GCalClient {
     +InsertEvent(event *calendar.Event, dataType string) error
 }
 
-fitbit2gcal.Service ..> fitbit2gcal.Factory
-fitbit2gcal.Factory --> fitbit2gcal.Service : gen
-fitbit2gcal.Factory --> fitbitauth.Store : gen
-fitbit2gcal.Factory --> gcalauth.Store : gen
-fitbit2gcal.Factory --> fitbit2gcal.FitbitClient : gen
-fitbit2gcal.Factory --> fitbit2gcal.GCalClient : gen
+
+di.DI <-- fitbit2gcal.FitbitClient
+di.DI <-- fitbit2gcal.GCalClient
+fitbit2gcal.FitbitClient -> auth.Store
+fitbit2gcal.GCalClient -> auth.Store
+di.DI <-- fitbit2gal.Service
+fitbit2gal.Service -> fitbit2gcal.FitbitClient
+fitbit2gal.Service -> fitbit2gcal.GCalClient
+
 
 @enduml

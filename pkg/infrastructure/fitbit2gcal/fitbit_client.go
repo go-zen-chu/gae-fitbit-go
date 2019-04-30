@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 
 	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
 	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
@@ -36,10 +37,12 @@ func (fc *fitbitClient) GetSleepData(dateStr string) (*df2g.Sleep, error) {
 	if err != nil {
 		return nil, err
 	}
-	cli := fc.config.OauthConfig.Client(context.Background(), token)
-	// make sure to save new token refreshed via oauth2 library
+	ctx := context.Background()
+	tokenSource := fc.config.OauthConfig.TokenSource(ctx, token)
+	cli := oauth2.NewClient(ctx, tokenSource)
 	defer func() {
-		if err := fc.store.WriteFitbitToken(token); err != nil {
+		err := fc.updateStoredToken(tokenSource)
+		if err != nil {
 			log.Errorf("%v\n", err)
 		}
 	}()
@@ -55,10 +58,12 @@ func (fc *fitbitClient) GetActivityData(dateStr string) (*df2g.Activity, error) 
 	if err != nil {
 		return nil, err
 	}
-	cli := fc.config.OauthConfig.Client(context.Background(), token)
-	// make sure to save new token refreshed via oauth2 library
+	ctx := context.Background()
+	tokenSource := fc.config.OauthConfig.TokenSource(ctx, token)
+	cli := oauth2.NewClient(ctx, tokenSource)
 	defer func() {
-		if err := fc.store.WriteFitbitToken(token); err != nil {
+		err := fc.updateStoredToken(tokenSource)
+		if err != nil {
 			log.Errorf("%v\n", err)
 		}
 	}()
@@ -67,6 +72,18 @@ func (fc *fitbitClient) GetActivityData(dateStr string) (*df2g.Activity, error) 
 		return nil, err
 	}
 	return a, nil
+}
+
+// make sure to save new token refreshed via oauth2 library
+func (fc *fitbitClient) updateStoredToken(tokenSource oauth2.TokenSource) error {
+	latestToken, err := tokenSource.Token()
+	if err != nil {
+		return errors.Wrap(err, "Error getting latest token")
+	}
+	if err = fc.store.WriteFitbitToken(latestToken); err != nil {
+		return errors.Wrap(err, "Error writing latest token")
+	}
+	return nil
 }
 
 func requestSleepData(cli *http.Client, dateStr string) (*df2g.Sleep, error) {
@@ -108,10 +125,6 @@ func requestFitbitData(cli *http.Client, dataType, dateStr string) ([]byte, erro
 	if err != nil {
 		return nil, errors.Wrap(err, "Error creating request")
 	}
-	// trasport will automatically add header
-	//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cli.)
-	log.Debugf("%v\n", req)
-
 	res, err := cli.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while requesting data to Fitbit")
@@ -120,11 +133,11 @@ func requestFitbitData(cli *http.Client, dataType, dateStr string) ([]byte, erro
 
 	resBytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Debugf("%v %s\n", res, string(resBytes))
+		log.Errorf("%v %s\n", res, string(resBytes))
 		return nil, errors.Wrap(err, "Error reading response body")
 	}
 	if res.StatusCode != http.StatusOK {
-		log.Debugf("%v %s\n", res, string(resBytes))
+		log.Errorf("%v %s\n", res, string(resBytes))
 		return nil, errors.New("Error response from Fitbit API")
 	}
 	log.Infof("%v\n", string(resBytes))

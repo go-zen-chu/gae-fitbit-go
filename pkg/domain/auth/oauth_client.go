@@ -23,7 +23,7 @@ func NewOAuthClient(config *oauth2.Config) OAuthClient {
 }
 
 func (oc *oauthClient) GetAuthCodeURL() string {
-	return oc.config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	return oc.config.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 }
 
 func (oc *oauthClient) Exchange(authCode string) (*oauth2.Token, error) {

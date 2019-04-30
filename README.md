@@ -25,7 +25,7 @@ cp app.yaml app.private.yaml
 # write CLIENT ID, SECRET and CALENDAR ID to env_variables
 vim app.private.yaml
 
-gcloud app deploy app.private.yaml 
+gcloud app deploy app.private.yaml
 ```
 
 Edit app.private.yaml like following.
@@ -44,3 +44,8 @@ env_variables:
 
 ### Set cron setting
 
+[job scheduling with cron.yaml | Go |  Google Cloud](https://cloud.google.com/appengine/docs/flexible/go/scheduling-jobs-with-cron-yaml)
+
+```
+$ gcloud app deploy cron.yaml
+```

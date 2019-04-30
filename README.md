@@ -40,6 +40,9 @@ env_variables:
   GAE_FITBIT_GO_GCAL_CLIENT_ID: xxxxxxxxx.apps.googleusercontent.com
   GAE_FITBIT_GO_GCAL_CLIENT_SECRET: xxxxxxxxxxxxx
   GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI: https://xxxxxxxxx.appspot.com/v1/gcalstoretoken
+  USE_CLOUD_STORAGE: true
+  CLOUD_STORAGE_BUCKET_NAME: xxxxxxxxx
+  GOOGLE_APPLICATION_CREDENTIALS: app/gae-fitbit-go/xxxxxxxx.json
 ````
 
 ### Set cron setting
@@ -49,3 +52,7 @@ env_variables:
 ```
 $ gcloud app deploy cron.yaml
 ```
+
+## architecture
+
+![](./docs/components.png)

@@ -1,8 +1,9 @@
-runtime: go111
+# https://cloud.google.com/appengine/docs/standard/reference/app-yaml?hl=ja&tab=go#top
+runtime: go119
 
 handlers:
-- url: /.*
-  script: auto
+  - url: /.*
+    script: auto
 
 liveness_check:
   path: "/index.html"

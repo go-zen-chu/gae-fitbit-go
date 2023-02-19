@@ -1,6 +1,6 @@
 # GAE Fitbit Go
 
-[![CircleCI](https://circleci.com/gh/go-zen-chu/gae-fitbit-go/tree/master.svg?style=svg)](https://circleci.com/gh/go-zen-chu/gae-fitbit-go/tree/master)
+[![Actions Status](https://github.com/go-zen-chu/gae-fitbit-go/workflows/ci/badge.svg)](https://github.com/go-zen-chu/gae-fitbit-go/actions/workflows/ci.yml)
 
 GAE App for getting your own sleep & activity data from fitbit and post it to google calendar.
 

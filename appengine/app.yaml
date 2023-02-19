@@ -11,3 +11,22 @@ liveness_check:
   timeout_sec: 4
   failure_threshold: 2
   success_threshold: 2
+
+# https://cloud.google.com/appengine/docs/standard/reference/app-yaml?hl=ja&tab=go#runtime_and_app_elements
+main: ./cmd/gae-fitbit-go
+
+env_variables:
+  GOOGLE_APPLICATION_CREDENTIALS: appengine/xxx-service-account.json
+  # if you use cloud storage
+  USE_CLOUD_STORAGE: true
+  CLOUD_STORAGE_BUCKET_NAME: cloud_storage_bucket
+  # fitbit
+  GAE_FITBIT_GO_FITBIT_AUTH_REDIRECT_URI: "https://your_app_domain/v1/fitbitstoretoken"
+  GAE_FITBIT_GO_FITBIT_CLIENT_ID: XXXXXX
+  GAE_FITBIT_GO_FITBIT_CLIENT_SECRET: xxxxxxxxxxxxxxxxxxx
+  # gcal
+  GAE_FITBIT_GO_GCAL_AUTH_REDIRECT_URI: "https://your_app_domain/v1/gcalstoretoken"
+  GAE_FITBIT_GO_GCAL_CLIENT_ID: xxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+  GAE_FITBIT_GO_GCAL_CLIENT_SECRET: xxxxxxxxxxxxxxxxxxx
+  GAE_FITBIT_GO_FITBIT_GCAL_ACTIVITY_CAL_ID: xxxxxxxxxxxxxxxxxxx@group.calendar.google.com
+  GAE_FITBIT_GO_FITBIT_GCAL_SLEEP_CAL_ID: xxxxxxxxxxxxxxxxxxx@group.calendar.google.com

@@ -3,7 +3,7 @@ package command_test
 import (
 	"os"
 
-	"github.com/go-zen-chu/gae-fitbit-go/pkg/application/command"
+	"github.com/go-zen-chu/gae-fitbit-go/internal/command"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

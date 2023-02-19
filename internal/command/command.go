@@ -9,8 +9,8 @@ import (
 	calendar "google.golang.org/api/calendar/v3"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/go-zen-chu/gae-fitbit-go/pkg/di"
-	"github.com/go-zen-chu/gae-fitbit-go/pkg/interface/handler"
+	"github.com/go-zen-chu/gae-fitbit-go/internal/di"
+	"github.com/go-zen-chu/gae-fitbit-go/internal/handler"
 )
 
 const (

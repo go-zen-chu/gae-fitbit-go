@@ -3,7 +3,7 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/go-zen-chu/gae-fitbit-go/pkg/application/command"
+	"github.com/go-zen-chu/gae-fitbit-go/internal/command"
 )
 
 func main() {

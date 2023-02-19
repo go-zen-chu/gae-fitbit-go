@@ -3,8 +3,8 @@ package di
 import (
 	"errors"
 
-	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
-	if2g "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/fitbit2gcal"
+	df2g "github.com/go-zen-chu/gae-fitbit-go/domain/fitbit2gcal"
+	if2g "github.com/go-zen-chu/gae-fitbit-go/infra/fitbit2gcal"
 )
 
 func (di DI) FitbitConfig() *df2g.FitbitConfig {

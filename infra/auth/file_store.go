@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
+	da "github.com/go-zen-chu/gae-fitbit-go/domain/auth"
 )
 
 type fileStore struct{}

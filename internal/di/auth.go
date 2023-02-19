@@ -3,8 +3,8 @@ package di
 import (
 	"github.com/pkg/errors"
 
-	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
-	ia "github.com/go-zen-chu/gae-fitbit-go/pkg/infrastructure/auth"
+	da "github.com/go-zen-chu/gae-fitbit-go/domain/auth"
+	ia "github.com/go-zen-chu/gae-fitbit-go/infra/auth"
 
 	"golang.org/x/oauth2"
 )

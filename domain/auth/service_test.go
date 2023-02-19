@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	"golang.org/x/oauth2"
 
-	. "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
+	. "github.com/go-zen-chu/gae-fitbit-go/domain/auth"
 )
 
 var _ = Describe("Service", func() {

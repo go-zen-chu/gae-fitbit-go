@@ -1,0 +1,13 @@
+# https://cloud.google.com/appengine/docs/standard/reference/app-yaml?hl=ja&tab=go#top
+runtime: go119
+
+handlers:
+  - url: /.*
+    script: auto
+
+liveness_check:
+  path: "/index.html"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2

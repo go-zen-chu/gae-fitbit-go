@@ -50,7 +50,7 @@ env_variables:
 [job scheduling with cron.yaml | Go |  Google Cloud](https://cloud.google.com/appengine/docs/flexible/go/scheduling-jobs-with-cron-yaml)
 
 ```
-$ gcloud app deploy cron.yaml
+gcloud app deploy cron.yaml
 ```
 
 ## architecture

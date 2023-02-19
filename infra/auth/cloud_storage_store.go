@@ -7,7 +7,7 @@ import (
 
 	"cloud.google.com/go/storage"
 
-	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
+	da "github.com/go-zen-chu/gae-fitbit-go/domain/auth"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )

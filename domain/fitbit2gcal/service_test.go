@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
+	. "github.com/go-zen-chu/gae-fitbit-go/domain/fitbit2gcal"
 )
 
 var _ = Describe("Service", func() {

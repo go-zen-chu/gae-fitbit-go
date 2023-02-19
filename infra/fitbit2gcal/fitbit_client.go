@@ -11,8 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 
-	da "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/auth"
-	df2g "github.com/go-zen-chu/gae-fitbit-go/pkg/domain/fitbit2gcal"
+	da "github.com/go-zen-chu/gae-fitbit-go/domain/auth"
+	df2g "github.com/go-zen-chu/gae-fitbit-go/domain/fitbit2gcal"
 	"github.com/pkg/errors"
 )
 

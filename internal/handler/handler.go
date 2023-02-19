@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-zen-chu/gae-fitbit-go/pkg/di"
+	"github.com/go-zen-chu/gae-fitbit-go/internal/di"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
